@@ -1,0 +1,190 @@
+<link rel='stylesheet' href="../style.css">
+
+<style>
+
+.mon_container {
+	background-color: #ffde84;
+	cursor: pointer;
+	text-align: left;
+	outline: none;
+	font-size: 18px;
+	width: 100%;
+	padding: 30px;
+	margin: 15px 3px;
+	border: none;
+	border-radius: 15px;
+	box-shadow: 0px 0px 5px orange;
+	/*padding: 15px calc(min(10%, 5px)) 15px calc(min(10%, 5px))
+	*/
+}
+
+.mon_container:hover {
+	background-color: rgb(255, 223, 162);
+	
+}
+
+.mon_content {
+	padding: 18px 18px;
+	display: none;
+	overflow: hidden;
+	text-align:center;
+}
+
+
+
+</style>
+
+
+
+	<img
+		src="elephant.jpg"
+		alt=""
+		class='centrer'
+		style='
+		max-height: 50%;
+		max-width: 80%;
+		margin-top: 20px;
+		margin-bottom: 10px;
+		'
+	>
+
+
+	<button
+		class="mon_container"
+	>
+		Séance découverte de la <b>méditation de pleine conscience et du programme MBSR</b> avec Valérie le 3 février
+
+		<div
+			class="mon_content"
+		>
+			<br>Valérie Vaissaire propose une séance gratuite à l'Espace Devi le 3 février de 17h30 à 18h30.
+			<br>
+			<br>Prochain programme de MBSR (Mindfull Based Stress Reduction) du 24 mars au 12 mai
+			<br>
+			<br>Pour plus d'informations allez sur le site :
+
+			<a
+				href="https://lapausesereine.fr/mes-actus.php"
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				https://lapausesereine.fr/mes-actus.php
+			</a>
+
+		</div>
+
+
+	</button>
+
+
+
+
+
+
+
+	<button
+		class="mon_container"
+	>
+	Prochaines séances de <b>Yoga Irano-égyptien</b>
+
+
+	<div
+		class="mon_content"
+	>
+		<!--img src="https://temporariesfr.files.wordpress.com/2023/01/yoga2021_1025012.png" alt=""-->
+		<img
+			src="Yoga2021_1025(012).png"
+			alt=""
+			class='centrer'
+		>
+		<br>
+		<br><b>Les scéances du samedi matin:</b>
+		<br>21 janvier 2023 - 9h30-10h45
+		<br>25 février 2023 - 9h30-12h
+		<br>18 mars 2023 - 9h30-10h45
+		<br>15 avril 2023 - 9h30-10h45
+		<br>20 mai 2023 - 9h30-12h
+		<br>17 juin 2023 - 9h30-10h45
+		<br>
+		<br>Pour réserver votre place contactez Patrick :
+		<br><a href="mailto:patrick.cyprien@gmail.com">patrick.cyprien@gmail.com</a>
+		<br>
+		<br>Pour plus d’information sur le Yoga Irano-égyptien visitez le site
+		<br>
+			<a
+				target="_blank"
+				rel="noopener noreferrer"
+				href="http://champdurespir.fr/contact.html"
+			>
+			champdurespir.fr
+			</a>
+
+	</div>
+		
+	</button>
+
+	
+
+
+
+
+
+	<button
+		class="mon_container"
+	>
+		<b>Chant Védique</b> avec Hélène dimanche 26 février et dimanche 16 avril 2023
+
+		<div
+			class="mon_content"
+		>
+			<br>
+			<br><img
+				src="actualite6.JPG"
+				alt=""
+				class='centrer'
+				style='
+				max-height: 500;
+				'
+			>
+			<br><!--img src="https://temporariesfr.files.wordpress.com/2023/01/actualite6.jpg" alt="" height="500"-->
+			<br>
+			<br>
+			<br>
+			<br>Pratiquer le chant védique, c’est réciter ou psalmodier des textes sacrés, rédigés en sanscrit. Ces textes proviennent de la plus ancienne tradition de l’Inde. La première étape de l’apprentissage consiste à écouter, puis à répéter. L’oreille est entraînée par des exercices d’écoute, ceci aiguise l’attention et la concentration. Dans un deuxième temps la signification du texte est abordée.
+			<br>
+			<br>Hélène est diplômée de l’Institut Français de Yoga depuis 2002. Parallèlement au yoga, elle a étudié le chant védique: initiation avec <i>Mekhala Desikachar</i> en 2001 à Chennai, puis de 2002 à 2007, elle a continué avec <i>Simone Templehof-Moors</i> (fondatrice en Belgique de l’école <i>Svadhyahya : Étude de soi et récitation des chants sacrés</i>).
+			<br>Hélène a continué à approfondir ses connaissances en chant védique chaque année, en participant aux séminaires de <i>Radha Sundararajan</i> de Chennai. Elle travaille aujourd’hui avec <i>Elisabeth Libraire</i> " qui a une approche très sensible des textes védiques et une connaissance affinée du sanscrit.
+			<br>
+			<br>
+			<br>
+			<br>Les chants qu’elle enseigne lui ont été transmis dans la tradition de Krishnamacharya.
+			<br>
+			<br>Participation : 30€
+			<br>
+			<br>Pour réserver votre place : <a target="_blank" rel="noopener noreferrer" href="https://docs.google.com/forms/d/e/1FAIpQLSfzfRNh5BE-ItEX1k3CblEQLTXwqqvhJb3Wq30znTn48bZ2xg/viewform">cliquez ici</a>
+		</div>
+		
+	</button>
+
+	
+
+
+
+
+	<script>
+
+	expands = document.getElementsByClassName('mon_container')
+	contents = document.getElementsByClassName('mon_content')
+
+	for(var i = 0; i < expands.length; ++i) {
+		const j = i
+		expands[i].addEventListener("click", ()=>{
+			if (contents[j].style.display == 'block') {
+				contents[j].style.display = 'none'
+			}else{
+				contents[j].style.display = 'block'
+			}
+		})
+	}
+
+	</script>

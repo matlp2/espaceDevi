@@ -1,0 +1,126 @@
+<html>
+
+	<head>
+		<title>EspaceDevi</title>
+		<meta content="">
+		<style></style>
+		<link rel='stylesheet' href="style.css">
+	</head>
+
+	<body
+		style='
+		margin:0;
+		
+		max-width:100%;overflow-x:hidden;/* disable horizontal scroll */
+		overflow-y:hidden;/* disable vertical scroll (le scroll est dans l iframe) */
+		background-color: rgba(255, 218, 130, 1);
+		
+		height: 100%;
+		'
+	>
+		<div
+			class="vertical_flex_list"
+			style="
+				list-style-type: none;
+				height: 100%;
+				margin: 0;
+				padding: 0;
+				gap:0px;
+			"
+		>
+			
+			<style>
+				.tabs_menu {
+					width: 100%;
+					background-color: rgba(255, 255, 255, .5);
+					padding-top: 0;
+					padding-bottom: 0;
+					font-family: sans-serif;
+					box-shadow: 0 -1px 10px 0px orange;
+					position: relative;/* position: relative pour que l'ombre soit au dessus les elms suivant de la liste */
+				}
+				.tabs_menu td {
+					cursor: pointer;
+					text-align: center;
+					padding-top: 10;
+					padding-bottom: 10;
+					/*font-size: calc(min(30px,100%));*/
+				}
+			</style>
+
+			<table
+				class='flex_elm_self_sized tabs_menu'
+				id='tab_menu'
+			>
+				<tbody>
+					<tr>
+						<td
+							onclick="tab_content.src = 'acceuil/acceuil.html'"
+						>
+							Accueil
+						</td>
+
+						<td
+							onclick="tab_content.src = 'planning/planning.html'"
+						>
+							Planning
+						</td>
+
+						<td
+							onclick="tab_content.src = 'actualite/actualite.html'"
+						>
+							Actualités
+						</td>
+
+						<td
+							onclick="tab_content.src = 'album/album.html'"
+						>
+							Album
+						</td>
+
+						<td
+							onclick="tab_content.src = 'contact/contact.html'"
+						>
+							Contact
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<iframe
+				id='tab_content'
+				class="flex_elm_streched"
+				src = 'acceuil/acceuil.html'
+				marginwidth="0"
+				marginheight="0"
+				frameborder="0"
+				style = '
+					margin: 0;
+					padding: 0;
+				'
+			
+			>
+			Browser not compatible
+			</iframe>
+			
+			<script>
+
+				const tab_content = document.getElementById('tab_content')
+				const tab_menu = document.getElementById('tab_menu')
+
+
+				const maj_tabs_menu_font_size = () => {
+					tab_menu.style['font-size'] = Math.min(25, .04*tab_content.clientWidth)
+				}
+				maj_tabs_menu_font_size()
+				window.addEventListener('resize',()=>{
+					maj_tabs_menu_font_size()
+				})
+
+			</script>
+
+		</div>
+
+	</body>
+
+</html>
