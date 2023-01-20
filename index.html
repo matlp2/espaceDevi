@@ -4,6 +4,7 @@
 		<title>EspaceDevi</title>
 		<meta content="">
 		<style></style>
+		<link rel="icon" type="image/x-icon" href="espaceDevi_orange_carre.png">
 		<link rel='stylesheet' href="style.css">
 	</head>
 
@@ -48,6 +49,9 @@
 				}
 			</style>
 
+			
+			
+
 			<table
 				class='flex_elm_self_sized tabs_menu'
 				id='tab_menu'
@@ -55,37 +59,108 @@
 				<tbody>
 					<tr>
 						<td
-							onclick="tab_content.src = 'acceuil/acceuil.html'"
+							id = 'tab_acceuil'
+							onclick="tab_content.src = 'acceuil/acceuil.html'; on_select_tab(this)"
 						>
 							Accueil
 						</td>
 
 						<td
-							onclick="tab_content.src = 'planning/planning.html'"
+							onclick="tab_content.src = 'planning/planning.html'; on_select_tab(this)"
 						>
 							Planning
 						</td>
 
 						<td
-							onclick="tab_content.src = 'actualite/actualite.html'"
+							onclick="tab_content.src = 'actualite/actualite.html'; on_select_tab(this)"
 						>
 							Actualités
 						</td>
 
 						<td
-							onclick="tab_content.src = 'album/album.html'"
+							onclick="tab_content.src = 'album/album.html'; on_select_tab(this)"
 						>
 							Album
 						</td>
 
 						<td
-							onclick="tab_content.src = 'contact/contact.html'"
+							onclick="tab_content.src = 'contact/contact.html'; on_select_tab(this)"
 						>
 							Contact
 						</td>
 					</tr>
 				</tbody>
 			</table>
+
+
+
+
+
+			<script>
+
+				function remove_children_nodes(elm) {
+					while (elm.firstChild) {
+						elm.removeChild(elm.lastChild);
+					}
+				}
+
+				var _selection = null
+
+				function on_select_tab(elm) {
+					
+					if(_selection !== null) {
+						for(const sub of _selection.children) {
+							if(sub.classList.contains('tab_selection_indicator')) {
+								_selection.removeChild(sub)
+								break
+							}
+						}
+					}
+
+					_selection = elm
+
+					_selection.style.position = 'relative'
+
+					
+
+					const tmp = document.createElement("div");
+					tmp.innerHTML = `
+					<div
+						class = "tab_selection_indicator"
+						style = "
+							position: absolute;
+							display: flex;
+							justify-content: center;
+							align-items: center;
+							width: 100%;
+							height: .25em;
+							bottom: 0%;
+						"
+					>
+						<div
+							style = "
+								background-color: rgb(250, 200, 100);
+								border-radius: .15em;
+								width: 5em;
+								height: .1em;
+							"
+						>
+						</div>
+					</div>
+					`
+					const indicator = tmp.children[0]
+
+					_selection.append(indicator)
+				}
+
+				on_select_tab(document.getElementById('tab_acceuil'))
+
+			</script>
+
+
+
+
+
 
 			<iframe
 				id='tab_content'
