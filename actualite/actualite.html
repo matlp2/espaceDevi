@@ -3,7 +3,7 @@
 <style>
 
 .mon_container {
-	background-color: #ffde84;
+	background-color: #ffe8ae;
 	cursor: pointer;
 	text-align: left;
 	outline: none;
@@ -13,13 +13,13 @@
 	margin: 15px 3px;
 	border: none;
 	border-radius: 15px;
-	box-shadow: 0px 0px 5px orange;
+	box-shadow: 0px 0px 5px rgb(255, 253, 250);
 	/*padding: 15px calc(min(10%, 5px)) 15px calc(min(10%, 5px))
 	*/
 }
 
 .mon_container:hover {
-	background-color: rgb(255, 223, 162);
+	background-color: rgb(255, 241, 212);
 	
 }
 
@@ -28,6 +28,12 @@
 	display: none;
 	overflow: hidden;
 	text-align:center;
+}
+
+.mon_header {
+	display: list-item;
+	list-style-type: disc;
+	list-style-position: inside;
 }
 
 
@@ -52,7 +58,10 @@
 	<button
 		class="mon_container"
 	>
-		<b>Sieste musicale</b> avec Anne-Sophie le dimanche 29 janvier de 15h à 16h
+
+		<div class="mon_header">
+			<b>Sieste musicale</b> avec Anne-Sophie le dimanche 29 janvier de 15h à 16h
+		</div>
 
 		<div
 			class="mon_content"
@@ -79,7 +88,9 @@
 	<button
 		class="mon_container"
 	>
-		Séance découverte de la <b>méditation de pleine conscience</b> et du programme MBSR avec Valérie le 3 février 2023
+		<div class="mon_header">
+			Séance découverte de la <b>méditation de pleine conscience</b> et du programme MBSR avec Valérie le 3 février 2023
+		</div>
 
 		<div
 			class="mon_content"
@@ -114,42 +125,44 @@
 	<button
 		class="mon_container"
 	>
-	Prochaines séances de <b>Yoga Irano-égyptien</b>
 
+		<div class="mon_header">
+			Prochaines séances de <b>Yoga Irano-égyptien</b>
+		</div>
 
-	<div
-		class="mon_content"
-	>
-		<!--img src="https://temporariesfr.files.wordpress.com/2023/01/yoga2021_1025012.png" alt=""-->
-		<img
-			src="Yoga2021_1025(012).png"
-			alt=""
-			class='centrer'
+		<div
+			class="mon_content"
 		>
-		<br>
-		<br><b>Les scéances du samedi matin:</b>
-		<br>21 janvier 2023 - 9h30-10h45
-		<br>25 février 2023 - 9h30-12h
-		<br>18 mars 2023 - 9h30-10h45
-		<br>15 avril 2023 - 9h30-10h45
-		<br>20 mai 2023 - 9h30-12h
-		<br>17 juin 2023 - 9h30-10h45
-		<br>
-		<br>Pour réserver votre place contactez Patrick :
-		<br><a href="mailto:patrick.cyprien@gmail.com">patrick.cyprien@gmail.com</a>
-		<br>
-		<br>Pour plus d’information sur le Yoga Irano-égyptien visitez le site
-		<br>
-			<a
-				target="_blank"
-				rel="noopener noreferrer"
-				href="http://champdurespir.fr/contact.html"
-				onclick="event.stopPropagation()"
+			<!--img src="https://temporariesfr.files.wordpress.com/2023/01/yoga2021_1025012.png" alt=""-->
+			<img
+				src="Yoga2021_1025(012).png"
+				alt=""
+				class='centrer'
 			>
-			champdurespir.fr
-			</a>
+			<br>
+			<br><b>Les scéances du samedi matin:</b>
+			<br>21 janvier 2023 - 9h30-10h45
+			<br>25 février 2023 - 9h30-12h
+			<br>18 mars 2023 - 9h30-10h45
+			<br>15 avril 2023 - 9h30-10h45
+			<br>20 mai 2023 - 9h30-12h
+			<br>17 juin 2023 - 9h30-10h45
+			<br>
+			<br>Pour réserver votre place contactez Patrick :
+			<br><a href="mailto:patrick.cyprien@gmail.com">patrick.cyprien@gmail.com</a>
+			<br>
+			<br>Pour plus d’information sur le Yoga Irano-égyptien visitez le site
+			<br>
+				<a
+					target="_blank"
+					rel="noopener noreferrer"
+					href="http://champdurespir.fr/contact.html"
+					onclick="event.stopPropagation()"
+				>
+				champdurespir.fr
+				</a>
 
-	</div>
+		</div>
 		
 	</button>
 
@@ -162,7 +175,10 @@
 	<button
 		class="mon_container"
 	>
-		<b>Chant Védique</b> avec Hélène dimanche 26 février et dimanche 16 avril 2023
+
+		<div class="mon_header">
+			<b>Chant Védique</b> avec Hélène dimanche 26 février et dimanche 16 avril 2023
+		</div>
 
 		<div
 			class="mon_content"
