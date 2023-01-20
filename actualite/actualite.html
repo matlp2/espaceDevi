@@ -9,8 +9,7 @@
 	outline: none;
 	font-size: 18px;
 	width: 80%;
-	padding: 30px;
-	border: none;
+	
 	border-radius: 15px;
 	box-shadow: 0px 0px 5px rgb(255, 159, 34);
 	border: 1px solid #eea700;
@@ -19,23 +18,31 @@
     margin-right: auto;
 	margin-top: 2em;
 	margin-bottom: 2em;
+	padding:0px;
 	/*padding: 15px calc(min(10%, 5px)) 15px calc(min(10%, 5px))
 	*/
+	/*transform: skewX(35deg);*/
 }
 
 .mon_container:hover {
-	background-color: rgb(255, 241, 212);
+	
+	background-color: rgb(255, 236, 197);
 	
 }
 
 .mon_content {
-	padding: 18px 18px;
-	display: none;
+	display: none;/* caché au départ */
+	padding: 1em;
 	overflow: hidden;
 	text-align:center;
+	border: 1px solid #ffbe26;
+	border-radius: 0px 0px 15px 15px;
+	background-color: rgb(255, 220, 149, .5);
+	width: auto;
 }
 
 .mon_header {
+	padding: 1.2em;
 	display: list-item;
 	list-style-type: disc;
 	list-style-position: inside;
@@ -246,16 +253,21 @@
 
 	<script>
 
-	expands = document.getElementsByClassName('mon_container')
-	contents = document.getElementsByClassName('mon_content')
+	const expands = document.getElementsByClassName('mon_container')
+	const contents = document.getElementsByClassName('mon_content')
 
 	for(var i = 0; i < expands.length; ++i) {
 		const j = i
 		expands[i].addEventListener("click", ()=>{
 			if (contents[j].style.display == 'block') {
 				contents[j].style.display = 'none'
+				
 			}else{
 				contents[j].style.display = 'block'
+				expands[j].scrollIntoView({ 
+					behavior: 'smooth',
+					block: 'center',
+				});
 			}
 		})
 	}
