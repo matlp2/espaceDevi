@@ -6,6 +6,9 @@
 
 		<meta name="description" content="Espace Devi, situé au coeur de la ville de Rennes est un lieu de pratique de Yoga.">
 
+
+		<!-- pour pas que le font size soit petit sur telephone -->
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		<style>
 		</style>
@@ -182,7 +185,7 @@
 				'
 			
 			>
-			Browser not compatible
+				Browser not compatible
 			</iframe>
 			
 			<script>
@@ -193,6 +196,9 @@
 
 				const maj_tabs_menu_font_size = () => {
 					tab_menu.style['font-size'] = Math.min(25, .04*tab_content.clientWidth)
+					//tab_content.style.fontSize = 1
+					const iframe_body = tab_content.contentWindow.document.querySelector('body')
+					iframe_body.style.fontSize = 25
 				}
 				maj_tabs_menu_font_size()
 				window.addEventListener('resize',()=>{
