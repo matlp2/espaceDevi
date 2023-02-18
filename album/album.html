@@ -35,9 +35,106 @@
 
 		<div
 			class="list"
+			id = "album_image_list"
 		>
 
-			<figure
+
+
+			<script>
+
+				const album_image_list = document.getElementById('album_image_list')
+
+				function nv_image(src, txt){
+
+					const cadre = document.createElement('div')
+					album_image_list.appendChild(cadre)
+					cadre.classList.add('ma_deco')
+					cadre.style.padding = 10
+					cadre.style.margin = 10
+					cadre.style.width = 280
+					cadre.style.height = 370
+
+					cadre.style.display = 'flex'
+					cadre.style.flexDirection = 'column'
+					cadre.style.flexWrap = 'nowrap'
+					cadre.style.justifyContent = 'space-evenly'
+					cadre.style.alignItems = 'stretch'
+					cadre.style.alignContent = 'stretch'
+					cadre.style.gap = '10'
+
+					const img = document.createElement('img')
+					img.src = src
+					img.style.flex = 1
+					img.style.height = '90%'
+					img.style.borderRadius = '10px'
+					img.style.overflow = 'hidden'
+					//img.margin ='0 auto'
+					//img.style.width = '100%'
+					//img.style.height = '90%'
+					img.style.objectFit = 'cover'
+					/*img.addEventListener('click', ev => {
+						const fsim = document.createElement('img')
+						//album_image_list.appendChild(fsim)
+						cadre.style.position = 'relative'
+						cadre.appendChild(fsim)
+						fsim.style.position = 'absolute'
+						fsim.style.top = 0
+						fsim.style.bottom = 0
+						fsim.style.left = 0
+						fsim.style.right = 0
+						fsim.style.zIndex = -10000
+					})*/
+
+
+					
+					
+					cadre.appendChild(img)
+
+					const etxt = document.createElement('div')
+					etxt.style.textAlign = 'center'
+					etxt.innerText = txt
+					etxt.flex = 'none'
+					etxt.style.margin = '7px 0px 0px 0px'
+					cadre.appendChild(etxt)
+				}
+
+				
+
+				nv_image(
+					'IMG_6010.jpg',
+					'Chant védique avec Hélène Daude, octobre 2022'
+				)
+
+				nv_image(
+					'IMG_6014.jpg',
+					'Chant védique'
+				)
+
+				nv_image(
+					'salle_personnes.jpg',
+					'L\'inauguration de la salle: le bain sonore avec Julien Le Roux.'
+				)
+
+				nv_image(
+					'IMG_5008.jpg',
+					'La decouverte de la reflexologie du bien être avec Laurence Gregori.'
+				)
+
+
+				nv_image(
+					'IMG_5023.jpg',
+					''
+				)
+				
+				nv_image(
+					'yin yoga johanna.jpg',
+					'Yin yoga avec Johanna'
+				)
+					
+
+			</script>
+
+			<!--figure
 				class="ma_deco"
 			>
 				<img src='IMG_6010.jpg' alt=''>
@@ -103,7 +200,7 @@
 				<figcaption>
 					Yin yoga avec Johanna
 				</figcaption>
-			</figure>
+			</figure-->
 
 		</div>
 	</body>
