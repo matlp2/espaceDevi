@@ -6,7 +6,7 @@
 
 .mon_container {
 	background-color: #ffe8ae;
-	cursor: pointer;
+	
 	text-align: left;
 	outline: none;
 	font-size: 18px;
@@ -24,10 +24,10 @@
 	/*padding: 15px calc(min(10%, 5px)) 15px calc(min(10%, 5px))
 	*/
 	/*transform: skewX(35deg);*/
+	
 }
 
 .mon_container:hover {
-	
 	background-color: rgb(255, 236, 197);
 	
 }
@@ -48,6 +48,16 @@
 	display: list-item;
 	list-style-type: disc;
 	list-style-position: inside;
+	cursor: pointer;
+	padding-top:1.2em;
+	padding-bottom:1.2em;
+	transition: padding-top .5s, padding-bottom .5s;
+}
+
+.mon_header:hover {
+	padding-top: 1.9em;
+	padding-bottom: 1.9em;
+	
 }
 
 
@@ -109,7 +119,7 @@
 	>
 
 		<div class="mon_header">
-			<b>Sieste musicale</b> avec Anne-Sophie le samedi 11 mars de 14h à 15h et samedi 1er avril de 14h à 15h
+			<b>Sieste musicale</b> avec Anne-Sophie le samedi 1er avril de 14h à 15h
 		</div>
 
 		<div
@@ -137,7 +147,7 @@
 
 
 
-	<button
+	<!--button
 		class="mon_container"
 	>
 
@@ -161,12 +171,12 @@
 
 		</div>
 		
-	</button>
+	</button-->
 
 
 
 
-	<button
+	<!--button
 		class="mon_container"
 	>
 
@@ -198,27 +208,9 @@
 				andonov.evelyne@gmail.com
 			</a>
 
-			<!--div>
-				<object data="test.pdf" type="application/pdf" width="300" height="200">
-					alt : <a href="./Annonce stage 19 mars2023 Espace Devi .docx.pdf">test.pdf</a>
-				</object>
-			</div>
-
-			<div>
-				<iframe src="./Annonce stage 19 mars2023 Espace Devi .docx.pdf" style="width:100%;height:700px;"></iframe>
-			</div>
-
-			<embed
-				src="pdfFiles/interfaces.pdf"
-				width="600"
-				height="500"
-				alt="pdf"
-				pluginspage="http://www.adobe.com/products/acrobat/readstep2.html"
-			-->
-
 		</div>
 		
-	</button>
+	</button-->
 	
 
 
@@ -339,7 +331,7 @@
 
 	<script>
 
-	const expands = document.getElementsByClassName('mon_container')
+	const expands = document.getElementsByClassName('mon_header')
 	const contents = document.getElementsByClassName('mon_content')
 
 	for(var i = 0; i < expands.length; ++i) {
