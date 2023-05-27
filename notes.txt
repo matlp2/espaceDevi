@@ -1,0 +1,6 @@
+
+python3 -m http.server
+
+http://localhost:8000
+
+ctr+f5 pour vider le cache, pour que les modifications des fichiers soient prises en compte
