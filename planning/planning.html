@@ -1,273 +1,389 @@
-
 <link rel='stylesheet' href="../style.css">
 
+
 <div
-	class = "list"
+	id = planning_grid
 	style="
-	min-height: 100%;
+		width: 100%;
+		height: 100%;
+		display: grid;
+		/*grid-template-columns: repeat(7, 1fr);*/
+		
+		grid-gap: 1px;
+		/*grid-auto-rows: minmax(100px, auto);*/
+		grid-template-rows: 7% 90%;
 	"
 >
+	<div>
 
-	<style>
-
-		.table_planning {
-			border-spacing: 0 1em;
-			table-layout: fixed;
-			text-align: center;
-			padding: .3em;
-			
-		}
-
-		.table_planning td:first-child {
-			border-top-left-radius: 15px;
-			border-bottom-left-radius: 15px;
-		}
-
-		.table_planning td:last-child {
-			border-top-right-radius: 15px;
-			border-bottom-right-radius: 15px;
-		}
-
-		.table_planning tr {
-
-			box-shadow: 0px 0px 10px rgb(255, 159, 34);
-			
-			border-radius: 15px;
-		}
-
-		.table_planning tr td {
-			padding: .3em;
-			background: linear-gradient(rgb(255, 237, 203), rgb(255, 232, 189));
-			
-		}
-
-		.table_planning td{
-			padding: .2em .1em .2em .1em;
-			
-		}
-
-
-	</style>
-
-	<table
-		cellspacing="0"
-		class="table_planning"
-	>
-		<!--
-Patrick http://champdurespir.fr/contact.html
-Maja https://www.maja-yoga.fr
-Basia https://www.basialepapeyoga.fr
-Violaine http://www.violainebriand.com
-Marie https://www.coeurdeyoga.fr/qui-sommes-nous/les-enseignantes/marie-bertrand
-Frank https://www.yoga-rennes.com
-Françoise mailto:francoisezambaux@gmail.com
-Johanna https://pranâm-yoga.fr
-
-		-->
-
-
-		
-
-		<tbody>
-
-			
-			<tr
-				style="
-				
-				border-radius: 20px;
-				border-top-right-radius: 20px;
-				"
-			>
-				<td>
-					Lundi 18h30 - 19h45
-					<br>20h00 - 21h15
-				</td>
-
-				<td>
-					<a
-						target="_blank"
-						rel="noopener noreferrer"
-						href='https://www.coeurdeyoga.fr/qui-sommes-nous/les-enseignantes/marie-bertrand'
-					>
-						Marie
-					</a>
-				</td>
-
-				<td>
-					Hatha Yoga
-				</td>
-				
-			</tr>
-
-
-
-			<tr>
-				<td>
-					Mercredi 19h30 - 20h30
-					<br>Jeudi 19h30 - 20h30
-				</td>
-
-				<td>
-					<a
-						target="_blank"
-						rel="noopener noreferrer"
-						href="mailto:francoisezambaux@gmail.com"
-					>
-						Françoise
-					</a>
-					
-				</td>
-
-				<td>
-					Hatha Yoga
-				</td>
-			</tr>
-
-
-
-			<tr>
-				<td>
-					Mercredi 10h30 - 12h00
-					<br>Jeudi 10h00 - 12h00
-				</td>
-
-				<td>
-					<a
-						target="_blank"
-						rel="noopener noreferrer"
-						href="https://www.coeurdeyoga.fr/qui-sommes-nous/les-enseignantes"
-					>
-					<script>
-						//href="https://www.basialepapeyoga.fr"
-					</script>
-					Basia
-					</a>
-					
-				</td>
-
-				<td>
-					Hatha Yoga
-				</td>
-			</tr>
-
-
-
-			<tr>
-				<td>
-					Mardi 18h30 - 19h45
-				</td>
-
-				<td>
-					<a
-						target="_blank"
-						rel="noopener noreferrer"
-						href='https://www.yoga-rennes.com'
-					>
-						Frank
-					</a>
-				</td>
-
-				<td>
-					Méditation et Yoga doux
-				</td>
-			</tr>
-
-
-
-			<tr>
-				<td>
-					Lundi 11h00-12h00
-					<br>12h30 - 13h30
-					<br>Mardi 12h30 - 13h30
-				</td>
-
-				<td>
-					<a
-						target="_blank"
-						rel="noopener noreferrer"
-						href='http://www.violainebriand.com'
-					>
-						Violaine
-					</a>
-				</td>
-
-				<td>
-					Feldenkrais
-				</td>
-			</tr>
-
-
-
-			<tr>
-				<td>
-					un Samedi par mois 9h30 - 10h45
-				</td>
-
-				<td>
-					<a
-						target="_blank"
-						rel="noopener noreferrer"
-						href='http://champdurespir.fr/contact.html'
-					>
-						Patrick
-					</a>
-				</td>
-
-				<td>
-					Yoga Irano-Egyptien
-				</td>
-			</tr>
-
-
-
-			<tr>
-				<td>
-					Une séance par mois
-					<br>15 avril 16h00 - 18h00
-				</td>
-
-				<td>
-					<a
-						target="_blank"
-						rel="noopener noreferrer"
-						href='https://pranâm-yoga.fr'
-					>
-						Johanna
-					</a>
-				</td>
-
-				<td>
-					Yin Yoga
-				</td>
-			</tr>
-
-		</tbody>
-	</table>
-
-
-	<script>
-		const maj_fonst_size_table_planning = () => {
-			for(var t of document.getElementsByClassName('table_planning')) {
-				t.style['font-size'] = Math.min(20, .05*window.innerWidth) + 'px'
-			}
-		}
-		maj_fonst_size_table_planning()
-		
-		window.addEventListener('resize', maj_fonst_size_table_planning)
-		
-
-	</script>
-
-	<div><!-- div pour pas que l'image soit étirée sur safari -->
-		<img
-			src="salledevi.jpg"
-			alt=""
-			style='
-				width: calc(min(40vw, 500px));
-				height: auto;
-			'
-		>
 	</div>
-	
+
 </div>
 
+<style>
+	.ma_deco {
+		box-shadow: 0px 0px 5px rgb(255, 159, 34);
+		border: 1px solid #eea700;
+		border-radius: 15px;
+		background-color: #ffe8ae;
+	}
+	.seance {
+		border-radius: calc(min(.9vw, .5em));
+		margin: calc(min(.2vw, .1em));
+	}
+</style>
+
+<script>
+	{
+		const planning_grid = document.getElementById('planning_grid')
+		//planning_grid.style.gap = '1px'
+
+		const jours = {
+			Lundi: {
+
+			},
+			Mardi: {
+
+			},
+			Mercredi: {
+
+			},
+			Jeudi: {
+
+			},
+			Vendredi: {
+
+			},
+			Samedi: {
+
+			},
+			/*Dimanche: {
+
+			}*/
+		}
+
+		function center_vertically(e) {
+			e.style.position = 'relative'
+			e.style.top = '50%'
+			e.style.transform = 'translateY(-50%)'
+		}
+
+		let k = 1
+		for(const [nom, o] of Object.entries(jours)) {
+			const e = document.createElement('div')
+			
+			{
+				const e1 = document.createElement('div')
+				center_vertically(e1)
+				e1.innerText = nom
+				//e1.style.fontSize = '1.2em'
+				e1.style.fontSize = 'calc(min(3vw, 1.2em))'
+				e.append(e1)
+			}
+			
+			e.style.textAlign = 'center'
+			e.style.text = 'center'
+			//e.style.height = '100%'
+			//e.style.padding = 'auto'
+			const s = e.style
+			e.style.textOverflow = 'clip'
+			s.gridColumn = k
+			s.gridRow = 1
+			e.style.margin = '20 0 0 0'
+			e.style.backgroundColor = 'rgba(255,255,255,.3)'
+			e.style.borderRadius = 'min(.9vw, .5em)'
+			planning_grid.append(e)
+			{
+				const div_cours = document.createElement('div')
+				div_cours.style.position = 'relative'
+				div_cours.style.gridColumn = k
+				div_cours.style.gridRow = 2
+				div_cours.style.backgroundColor = 'rgba(255,255,255,.2)'
+				div_cours.style.borderRadius = 'min(.9vw, .5em)'
+				planning_grid.append(div_cours)
+				o.div_cours = div_cours
+			}
+			
+			++k
+		}
+
+		
+
+
+		const profs = {
+			Violaine: {
+				lien:'http://www.violainebriand.com',
+				bg: 'grey',
+			},
+			Edith: {
+				lien: 'mailto:edemoget@gmail.com',
+				bg: [1,1,1],
+			},
+			Marie: {
+				lien: 'https://www.coeurdeyoga.fr/qui-sommes-nous/les-enseignantes/marie-bertrand',
+				bg: 'blue',
+			},
+			Franck: {
+				lien: 'https://www.yoga-rennes.com',
+				bg: 'green',
+			},
+			Françoise: {
+				lien: 'mailto:francoisezambaux@gmail.com',
+				bg: 'purple',
+			},
+			Basia: {
+				lien: 'https://www.coeurdeyoga.fr/qui-sommes-nous/les-enseignantes',
+				bg: 'red',
+			},
+			Claire: {
+				lien: 'https://www.dalipclaire.com/deesse',
+				bg: 'cyan',
+			},
+			Evelyne: {
+				lien: 'https://www.yogarennes.org/membre/evelyne-andonov/',
+				bg: 'turquoise',
+			},
+			Valérie: {
+				lien: 'https://lapausesereine.fr',
+				bg: '',
+			},
+			Patrick: {
+				lien: 'http://champdurespir.fr/contact.html',
+				bg: 'orange',
+			},
+		}
+
+		for(const [nom, prof] of Object.entries(profs)) {
+			prof.nom = nom
+		}
+
+		const cours = [
+
+			// Lundi
+			{
+				jour: 'Lundi',
+				deb: [9, 45],
+				fin: [10, 45],
+				bg: 'purple',
+				txt: 'Yoga pré et post natal',
+				prof: profs.Edith,
+			},
+			{
+				jour: 'Lundi',
+				deb: [12, 30],
+				fin: [13, 30],
+				bg: 'blue',
+				txt: 'Feldenkrais',
+				prof: profs.Violaine,
+			},
+			{
+				jour: 'Lundi',
+				deb: [18, 30],
+				fin: [19, 45],
+				bg: 'blue',
+				txt: 'Hatha Yoga',
+				prof: profs.Marie,
+			},
+			{
+				jour: 'Lundi',
+				deb: [20, 0],
+				fin: [21, 15],
+				bg: 'blue',
+				txt: 'Hatha Yoga',
+				prof: profs.Marie,
+			},
+
+			// Mardi
+			{
+				jour: 'Mardi',
+				deb: [11, 0],
+				fin: [12, 0],
+				txt: 'Yoga pré et post natal',
+				bg: 'pink',
+				prof: profs.Edith,
+			},
+			{
+				jour: 'Mardi',
+				deb: [12, 30],
+				fin: [13, 30],
+				bg: 'cyan',
+				txt: 'Feldenkrais',
+				prof: profs.Violaine,
+			},
+			{
+				jour: 'Mardi',
+				deb: [18, 30],
+				fin: [19, 45],
+				bg: 'cyan',
+				txt: 'Méditation et Yoga doux',
+				prof: profs.Franck,
+			},
+
+			// Mercredi
+			{
+				jour: 'Mercredi',
+				deb: [10, 30],
+				fin: [12, 0],
+				txt: 'Hatha Yoga',
+				prof: profs.Basia,
+				bg: 'grey',
+			},
+			{
+				jour: 'Mercredi',
+				deb: [12, 30],
+				fin: [13, 30],
+				txt: 'Hatha Yoga',
+				prof: profs.Basia,
+				bg: 'green',
+			},
+			{
+				jour: 'Mercredi',
+				deb: [19, 30],
+				fin: [20, 30],
+				txt: 'Hatha Yoga',
+				prof: profs.Françoise,
+				bg: 'magenta',
+			},
+
+			// Jeudi
+			{
+				jour: 'Jeudi',
+				deb: [10, 0],
+				fin: [12, 0],
+				txt: 'Hatha Yoga',
+				prof: profs.Basia,
+				bg: 'magenta',
+			},
+			{
+				jour: 'Jeudi',
+				deb: [12, 30],
+				fin: [13, 45],
+				txt: 'Méditation Pleine conscience',
+				prof: profs.Valérie,
+				bg: 'magenta',
+			},
+			{
+				jour: 'Jeudi',
+				deb: [18, 30],
+				fin: [19, 45],
+				txt: 'Kundalini Yoga',
+				prof: profs.Claire,
+				bg: 'magenta',
+			},
+
+			// Vendredi
+			{
+				jour: 'Vendredi',
+				deb: [9, 30],
+				fin: [11, 0],
+				txt: 'Hatha Yoga',
+				prof: profs.Evelyne,
+				bg: 'magenta',
+			},
+
+			// Samedi
+			{
+				jour: 'Samedi',
+				deb: [9, 0],
+				fin: [10, 15],
+				txt: 'Yoga Irano-égyptien<br>(1 semaine sur 2)',
+				prof: profs.Patrick,
+				bg: 'magenta',
+			},
+			{
+				jour: 'Samedi',
+				deb: [10, 30],
+				fin: [11, 30],
+				txt: 'Hatha Yoga',
+				prof: profs.Françoise,
+				bg: 'magenta',
+			},
+			{
+				jour: 'Samedi',
+				deb: [11, 30],
+				fin: [12, 30],
+				txt: 'Hatha Yoga',
+				prof: profs.Françoise,
+				bg: 'magenta',
+			},
+			{
+				jour: 'Samedi',
+				deb: [13, 30],
+				fin: [15, 30],
+				txt: 'Méditation (1 semaine sur 2)',
+				prof: profs.Valérie,
+				bg: 'magenta',
+			},
+		]
+
+		let min = 24
+		let max = 0
+
+		const get_time = ([heure,minute]) => heure + minute/60
+
+		for(const cour of cours) {
+			min = Math.min(min, get_time(cour.deb))
+			max = Math.max(max, get_time(cour.fin))
+			console.log({min,max})
+		}
+
+		
+
+		for(const cour of cours) {
+			const e = document.createElement('div')
+			s = e.style
+			const jour = jours[cour.jour]
+			e.style.position = 'absolute'
+			e.style.right = '0%'
+			e.style.left = '0%'
+			//const d = Math.min(max-min, 13)
+			const d = max-min
+			e.style.top = 100*((cour.deb[0] + cour.deb[1]/60 - min)/d) + '%'
+			e.style.bottom = 100*(1-(cour.fin[0] + cour.fin[1]/60 - min)/d) + '%'
+			e.style.textAlign = 'center'
+			//e.style.backgroundColor = cour.bg
+			//e.style.fontSize = 'calc(min(1.6vw, .8em))'
+			e.style.fontSize = 'min(1.6vw, .8em)'
+			e.classList.add('seance')
+			e.classList.add('ma_deco')
+			{
+				const e2 = document.createElement('div')
+				center_vertically(e2)
+				{
+					const div_horaires = document.createElement('div')
+					div_horaires.innerText = `${cour.deb[0]}h${cour.deb[1] ? cour.deb[1] : ''} - ${cour.fin[0]}h${cour.fin[1] ? cour.fin[1] : ''}`
+					//div_horaires.style.padding = 'auto'
+					//div_horaires.style.textAlign = 'center'
+					//div_horaires.style.width = '100%'
+					e2.appendChild(div_horaires)
+				}
+				{
+					const div_txt = document.createElement('div')
+					div_txt.innerHTML = cour.txt
+					e2.appendChild(div_txt)
+				}
+				//e2.append(cour.txt)
+				if (cour.prof.lien) {
+					//const br = document.createElement("span");
+					//br.innerHTML = "<br/>";
+					//e2.append(br)
+					const a = document.createElement('a')
+					a.target = "_blank"
+					a.rel = "noopener noreferrer"
+					a.href = cour.prof.lien
+					a.innerText = `${cour.prof.nom}`
+					
+					e2.appendChild(a)
+				}else{
+					const a = document.createElement('div')
+					a.innerText = `${cour.prof.nom}`
+					e2.appendChild(a)
+				}
+				e.append(e2)
+			}
+			
+			
+			jour.div_cours.appendChild(e)
+		}
+	}
+</script>
