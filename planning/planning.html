@@ -327,6 +327,29 @@
 			console.log({min,max})
 		}
 
+		function remap(t, A, B, A2, B2) {
+			return A2 + ((t - A) / (B - A))*(B2 - A2)
+		}
+
+		function map_retire_intervalle(t, intervalle, intervalle_enlevé) {
+			const [A, B] = intervalle
+			const [A2, B2] = intervalle_enlevé
+			M = .5*(A2 + B2)
+			return t < M ? remap(t, A, A2, A, M) : remap(t, B2, B, M, B)
+		}
+
+		function map_time_simple([hour, minutes]) {
+			const d = max-min
+			return (hour + minutes/60 - min)/d
+		}
+		
+		function map_time_remove_interval(hour_minutes) {
+			return map_retire_intervalle(
+				map_time_simple(hour_minutes),
+				[0, 1],
+				[map_time_simple([16,0]), map_time_simple([18,30])]
+			)
+		}
 		
 
 		for(const cour of cours) {
@@ -337,9 +360,9 @@
 			e.style.right = '0%'
 			e.style.left = '0%'
 			//const d = Math.min(max-min, 13)
-			const d = max-min
-			e.style.top = 100*((cour.deb[0] + cour.deb[1]/60 - min)/d) + '%'
-			e.style.bottom = 100*(1-(cour.fin[0] + cour.fin[1]/60 - min)/d) + '%'
+			
+			e.style.top = 100*map_time_remove_interval(cour.deb) + '%'
+			e.style.bottom = 100*(1-map_time_remove_interval(cour.fin)) + '%'
 			e.style.textAlign = 'center'
 			//e.style.backgroundColor = cour.bg
 			//e.style.fontSize = 'calc(min(1.6vw, .8em))'
