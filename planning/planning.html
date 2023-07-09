@@ -339,9 +339,11 @@
 		}
 
 		function map_time_simple([hour, minutes]) {
-			const d = max-min
-			return (hour + minutes/60 - min)/d
+			const d = map_time_simple.max-map_time_simple.min
+			return (hour + minutes/60 - map_time_simple.min)/d
 		}
+		map_time_simple.max = max
+		map_time_simple.min = min
 		
 		function map_time_remove_interval(hour_minutes) {
 			return map_retire_intervalle(
