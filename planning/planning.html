@@ -66,18 +66,21 @@
 			e.style.position = 'relative'
 			e.style.top = '50%'
 			e.style.transform = 'translateY(-50%)'
+			//e.style.verticalAlign = 'center'
+			//e.style.margin = 'auto 0'
 		}
 
 		let k = 1
 		for(const [nom, o] of Object.entries(jours)) {
 			const e = document.createElement('div')
 			
+			
 			{
 				const e1 = document.createElement('div')
 				center_vertically(e1)
 				e1.innerText = nom
 				//e1.style.fontSize = '1.2em'
-				e1.style.fontSize = 'calc(min(3vw, 1.2em))'
+				e1.style.fontSize = 'calc(min(min(3vw, 1.2em), 3vh))'
 				e.append(e1)
 			}
 			
@@ -326,14 +329,14 @@
 				prof: profs.Françoise,
 				bg: 'magenta',
 			},
-			{
+			/*{
 				jour: 'Samedi',
 				deb: [13, 30],
 				fin: [15, 30],
 				txt: 'Méditation (1 semaine sur 2)',
 				prof: profs.Valérie,
 				bg: 'magenta',
-			},
+			},*/
 		]
 
 		let min = 24
