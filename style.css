@@ -1,6 +1,13 @@
 
+
+* {
+	font-family: sans-serif;
+	color: #331302;
+}
+
+
 .ma_deco {
-	box-shadow: 0px 0px 5px rgb(255, 159, 34);
+	box-shadow: 0px 0px 3px rgb(255, 159, 34);
 	border: 1px solid #eea700;
 	border-radius: 15px;
 	background-color: #ffe8ae;
@@ -17,9 +24,6 @@
 
 
 
-* {
-	font-family: sans-serif;
-}
 
 .center {
 	display: block;
@@ -46,6 +50,16 @@
 	display:flex;
 	flex-direction:column;
 	justify-content:stretch;
+}
+
+.acceuil_flex_list {
+	display:flex;
+	flex-direction:column;
+	justify-content:stretch;
+}
+
+.acceuil_flex_list > * {
+	/*padding: 2em;*/
 }
 
 .flex_elm_streched {
