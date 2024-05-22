@@ -1,28 +1,39 @@
+
+
+
 <link rel='stylesheet' href="../style.css">
 
 
 <div
-	class='vertical_flex_list'
+	class='acceuil_flex_list'
 	style="
-	min-height: 100vh;
-	margin: 0;
-	padding: 0;
-	gap:0;
-	list-style-type: none;
+		min-height: 100vh;
+		margin: 6em 0;
+		padding: 2em 0;
+		gap: 20px 70px;
+		list-style-type: none;
+		background: #fff7b1;
 	"
 >
 	<div
 		class="flex_elm_streched expanded list"
 	>
-
-		<img
-			src="1.jpg"
-			alt=""
+		<div
 			style="
-			max-height:500;
-			max-width: 100%;
+				/*padding: 1em;*/
 			"
 		>
+			<img
+				class = "ma_deco"
+				src="1.jpg"
+				alt=""
+				style="
+					max-height:500;
+					max-width: 100%;
+					/*border-radius: 1em;*/
+				"
+			>
+		</div>
 
 		<table>
 			<tbody>
@@ -36,7 +47,6 @@
 								max-width:250;
 								max-height:250;
 							'
-							
 						>
 					</td>
 				</tr>
@@ -44,11 +54,14 @@
 				<tr>
 					<td>
 						<div
+							class = "ma_deco"
 							style='
-								text-align: center;
+								text-align: left;
 								max-width: 400;
 								font-family: sans-serif;
 								font-size: 20;
+								padding: 2em;
+								
 							'
 						>
 							
@@ -56,7 +69,7 @@
 								situé au coeur de la ville de Rennes est un lieu de pratique de Yoga et disciplines de bien-être.
 								Les cours ont lieu en petits groupes,
 								dans un cadre agréable et chaleureux,
-								sous les bons auspices de Sarasvati,
+								sous les bons auspices de Saraswati,
 								la déesse des arts et de l'apprentissage.
 							
 						</div>
@@ -66,70 +79,148 @@
 		</table>
 
 	</div>
+</div>
 
 
 
-	<table
-		class="flex_elm_self_sized"
+<div
+	style="
+		text-align: left;
+		padding: 3em;
+		background-color: rgb(255, 226, 167);
+		margin-top: 10em;
+		box-shadow: 0 1px 10px 0px orange;
+		width: 100%;
+		line-height: 2em;
+		
+		
+	"
+
+>
+
+	<h3>
+		adresse:
+	</h3>
+
+	<span
 		style="
-			text-align: center;
-			background-color: rgb(255, 226, 167);
-			margin-top: 40px;
-			padding-top: 10px;
-			padding-bottom: 10px;
-			box-shadow: 0 1px 10px 0px orange;
+			text-indent: 2em;
 		"
 	>
-		<tbody>
-			<tr>
-				<td>
-					adresse :
-					<br><a
-						href="https://www.google.com/maps/place/48a+Rue+d'Antrain,+35000+Rennes/@48.1163503,-1.6810284,17.29z/data=!4m5!3m4!1s0x480ede3712a15555:0x817f120cac3aa6!8m2!3d48.1164497!4d-1.6784843"
-						target="_blank"
-						rel="noopener noreferrer"
-						style="
-							padding:40px;
-						"
-						>
-						Espace Devi 48A, rue d'Antrain (en face du Lycée St Martin)
-					</a>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<div>
-						sites amis:
-					</div>
-				</td>
-			</tr>
-			
-			<tr>
-				<td>
-					<a
-						href="https://www.coeurdeyoga.fr/"
-					>
-						coeurdeyoga.fr
-					</a>
-				</td>
-			</tr>
-			
-			<tr>
-				<td>
-					<a
-						href="https://www.basialepapeyoga.fr/"
-						target="_blank"
-						rel="noopener noreferrer" 
-					>
-						basialepapeyoga.fr
-					</a>
-				</td>
-			</tr>
-
-		</tbody>
-	</table>
-
+		<a
+			href="https://www.google.com/maps/place/48a+Rue+d'Antrain,+35000+Rennes/@48.1163503,-1.6810284,17.29z/data=!4m5!3m4!1s0x480ede3712a15555:0x817f120cac3aa6!8m2!3d48.1164497!4d-1.6784843"
+			target="_blank"
+			rel="noopener noreferrer"
+			style="
+				color: #e75c00;
+			"
+			>
+			Espace Devi 48A, rue d'Antrain (en face du Lycée St Martin)
+		</a>
+	</span>
 	
 
 
+
+	<h3>
+		sites amis:
+	</h3>
+	<span
+		style="
+			text-indent: 2em;
+			text-align:unset;
+		"
+	>
+		<a
+			href="https://www.coeurdeyoga.fr/"
+			style="
+				text-indent: 2em;
+				color: #e75c00;
+			"
+		>
+			coeurdeyoga.fr
+		</a>
+
+		<br>
+
+		<a
+			href="https://www.basialepapeyoga.fr/"
+			target="_blank"
+			rel="noopener noreferrer" 
+			style="
+				text-indent: 2em;
+				color: #e75c00;
+			"
+		>
+			basialepapeyoga.fr
+		</a>
+
+	</span>
+
+	
+
+	
+	
 </div>
+
+
+<!--table
+	class="flex_elm_self_sized"
+	style="
+		text-align: left;
+		padding: 3em;
+		background-color: rgb(255, 226, 167);
+		margin-top: 10em;
+		box-shadow: 0 1px 10px 0px orange;
+		width: 100%;
+	"
+>
+	<tbody>
+		<tr>
+			<td>
+				adresse :
+				<br><a
+					href="https://www.google.com/maps/place/48a+Rue+d'Antrain,+35000+Rennes/@48.1163503,-1.6810284,17.29z/data=!4m5!3m4!1s0x480ede3712a15555:0x817f120cac3aa6!8m2!3d48.1164497!4d-1.6784843"
+					target="_blank"
+					rel="noopener noreferrer"
+					style="
+						padding:40px;
+					"
+					>
+					Espace Devi 48A, rue d'Antrain (en face du Lycée St Martin)
+				</a>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div>
+					sites amis:
+				</div>
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
+				<a
+					href="https://www.coeurdeyoga.fr/"
+				>
+					coeurdeyoga.fr
+				</a>
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
+				<a
+					href="https://www.basialepapeyoga.fr/"
+					target="_blank"
+					rel="noopener noreferrer" 
+				>
+					basialepapeyoga.fr
+				</a>
+			</td>
+		</tr>
+
+	</tbody>
+
+</table-->
