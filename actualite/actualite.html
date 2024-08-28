@@ -48,9 +48,9 @@
 
 .mon_header {
 	padding: 1.2em;
-	display: list-item;
+	/*display: list-item;
 	list-style-type: disc;
-	list-style-position: inside;
+	list-style-position: inside;*/
 	cursor: pointer;
 	padding-top:1.2em;
 	padding-bottom:1.2em;
@@ -88,6 +88,23 @@
 		'
 	>
 
+
+	<svg width="0" height="0" xmlns="http://www.w3.org/2000/svg" style="position: absolute;">
+		<!-- Define the SVG symbol -->
+		<defs>
+
+			<symbol id="Mouette" viewBox="0 0 25 25">
+				<!--svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" focusable="false" viewBox="0 0 24 24"-->
+					<path fill="#331302" d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/>
+				<!--/svg-->
+			</symbol>
+
+		</defs>
+	</svg>
+
+
+	
+	
 	
 	<!--button
 		class="mon_container"
@@ -729,14 +746,18 @@
 
 
 
-	<button
+	<!--button
 		class="mon_container"
 	>
 
 		<div class="mon_header">
 			<b>Cours d'été</b>
 			animés par Françoise
+			
 		</div>
+
+		
+		
 
 		<div
 			class="mon_content"
@@ -760,7 +781,7 @@
 
 		</div>
 		
-	</button>
+	</button-->
 
 
 
@@ -1064,9 +1085,26 @@
 
 	for(var i = 0; i < expands.length; ++i) {
 		const j = i
+		expands[i].prepend((()=>{
+			const svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg')
+			svg.style.verticalAlign = 'middle'
+			svg.style.transform = `rotate(-90deg)`
+			svg.style.transition = 'transform 0.5s ease'
+			svg.setAttribute('width', '35')
+			svg.setAttribute('heigth', '35')
+			{
+				const use_href = document.createElementNS("http://www.w3.org/2000/svg", 'use')
+				use_href.setAttribute('href', '#Mouette')
+				
+				svg.append(use_href)
+			}
+			expands[i].mouette = svg
+			return svg
+		})())
 		expands[i].addEventListener("click", ()=>{
 			if (contents[j].style.display == 'block') {
 				contents[j].style.display = 'none'
+				expands[j].mouette.style.transform = `rotate(-90deg)`
 				
 			}else{
 				contents[j].style.display = 'block'
@@ -1074,6 +1112,7 @@
 					behavior: 'smooth',
 					block: 'center',
 				});
+				expands[j].mouette.style.transform = ''
 			}
 		})
 	}
