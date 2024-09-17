@@ -201,12 +201,17 @@
 					const e1 = document.createElement('div')
 					//center_vertically(e1)
 					e1.style.display = 'flex';
+					e1.style.display = 'display';
+					e1.style.display = 'inline-block';
             		e1.style.justifyContent = 'center'; /* Center horizontally */
-            		e1.style.alignItems = 'center';
+            		//e1.style.alignItems = 'center';
+            		e1.style.alignItems = 'stretch';
+            		e1.style.clear = 'both';
 					e1.innerText = nom
-					e1.style.height = '100%'
+					//e1.style.height = '100%'
 					//e1.style.fontSize = '1.2em'
 					e1.style.fontSize = 'calc(min(min(3vw, 1.2em), 3vh))'
+					e1.style.verticalAlign = 'middle'
 					e.append(e1)
 				}
 				
@@ -487,14 +492,14 @@
 					txt: 'Feldenkrais',
 					prof: profs.Violaine,
 				},
-				{
+				/*{
 					jour: 'Mardi',
 					deb: [19, 45],
 					fin: [20, 45],
 					bg: 'blue',
 					txt: 'Méditation et Yoga doux',
 					prof: profs.Franck,
-				},
+				},*/
 				{
 					jour: 'Lundi',
 					deb: [18, 30],
