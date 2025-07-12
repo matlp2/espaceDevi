@@ -202,36 +202,29 @@
 			let k = 1
 
 			for(const [nom, o] of Object.entries(jours)) {
-				const e = document.createElement('div')
 				
+				const e = document.createElement('div')
 				
 				{
 					const e1 = document.createElement('div')
-					//center_vertically(e1)
 					e1.style.display = 'flex';
-					e1.style.display = 'display';
-					e1.style.display = 'inline-block';
-            		e1.style.justifyContent = 'center'; /* Center horizontally */
-            		//e1.style.alignItems = 'center';
+            		e1.style.justifyContent = 'center';
             		e1.style.alignItems = 'stretch';
             		e1.style.clear = 'both';
 					e1.innerText = nom
-					//e1.style.height = '100%'
-					//e1.style.fontSize = '1.2em'
 					e1.style.fontSize = 'calc(min(min(3vw, 1.2em), 3vh))'
 					e1.style.verticalAlign = 'middle'
 					e.append(e1)
 				}
 				
 				e.style.textAlign = 'center'
-				//e.style.text = 'center'
-				//e.style.height = '100%'
-				//e.style.padding = 'auto'
-				const s = e.style
+				e.style.display = 'flex'
+				e.style.height = '100%'
+				e.style.justifyContent = 'center'
+    			e.style.alignItems = 'center'
 				e.style.textOverflow = 'clip'
-				s.gridColumn = k
-				s.gridRow = 1
-				e.style.margin = '20 0 0 0'
+				e.style.gridColumn = k
+				e.style.gridRow = 1
 				e.style.backgroundColor = 'rgba(255,255,255,.3)'
 				e.style.borderRadius = 'min(.9vw, .5em)'
 				planning_grid.append(e)
@@ -322,9 +315,6 @@
 					}
 					//e2.append(cour.txt)
 					if (cour.prof.lien) {
-						//const br = document.createElement("span");
-						//br.innerHTML = "<br/>";
-						//e2.append(br)
 						const a = document.createElement('a')
 						a.target = "_blank"
 						a.rel = "noopener noreferrer"
@@ -710,7 +700,7 @@
 					jour: 'Samedi',
 					deb: [9, 0],
 					fin: [10, 15],
-					txt: 'Yoga Irano-égyptien (1 semaine sur 2)',
+					txt: 'Yoga Irano-égyptien<br>(1 semaine sur 2)',
 					prof: profs.Patrick,
 					bg: 'magenta',
 				},
@@ -718,7 +708,7 @@
 					jour: 'Samedi',
 					deb: [10, 0],
 					fin: [11, 0],
-					txt: 'Yin Yoga (1 semaine sur 2)',
+					txt: 'Yin Yoga<br>(1 semaine sur 2)',
 					prof: profs['Françoise Zambaux'],
 					bg: 'magenta',
 				},
@@ -726,7 +716,7 @@
 					jour: 'Samedi',
 					deb: [11, 0],
 					fin: [12, 0],
-					txt: 'Hatha Yoga (1 semaine sur 2)',
+					txt: 'Hatha Yoga<br>(1 semaine sur 2)',
 					prof: profs['Françoise Zambaux'],
 					bg: 'magenta',
 				},
