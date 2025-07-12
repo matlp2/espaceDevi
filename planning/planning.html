@@ -16,23 +16,8 @@
 	"
 >
 	Planning 2023/2024
-</div>
-
-
-<div
-	id = planning_grid
-	style="
-		width: 100%;
-		height: 100%;
-		display: grid;
-		/*grid-template-columns: repeat(7, 1fr);*/
-		
-		grid-gap: 1px;
-		/*grid-auto-rows: minmax(100px, auto);*/
-		grid-template-rows: 7% 90%;
-	"
->
 </div-->
+
 
 
 <!--div
@@ -53,11 +38,12 @@
 <div
 	id = planning_grid2
 	style="
+		font-family: 'Inter', sans-serif;
+		margin-top: 1.5em;
 		width: 100%;
 		height: 100%;
 		display: grid;
-		/*grid-template-columns: repeat(7, 1fr);*/
-		
+		grid-template-columns: repeat(6, 1fr); /* Equal width columns */
 		grid-gap: 1px;
 		/*grid-auto-rows: minmax(100px, auto);*/
 		grid-template-rows: 7% 90%;
@@ -118,7 +104,6 @@
 			//e.style.margin = 'auto 0'
 		}
 
-		const planning_grid = document.getElementById('planning_grid')
 		const planning_grid2 = document.getElementById('planning_grid2')
 
 
@@ -202,33 +187,31 @@
 			let k = 1
 
 			for(const [nom, o] of Object.entries(jours)) {
+
+				{// jour
+					const e = document.createElement('div')
 				
-				const e = document.createElement('div')
-				
-				{
-					const e1 = document.createElement('div')
-					e1.style.display = 'flex';
-            		e1.style.justifyContent = 'center';
-            		e1.style.alignItems = 'stretch';
-            		e1.style.clear = 'both';
-					e1.innerText = nom
-					e1.style.fontSize = 'calc(min(min(3vw, 1.2em), 3vh))'
-					e1.style.verticalAlign = 'middle'
-					e.append(e1)
+					{
+						const e1 = document.createElement('div')
+						e1.innerText = nom
+						e1.style.fontSize = 'calc(min(min(3vw, 1.2em), 3vh))'
+						e.append(e1)
+					}
+					
+					e.style.textAlign = 'center'
+					e.style.display = 'flex'
+					e.style.height = '100%'
+					e.style.justifyContent = 'center'
+					e.style.alignItems = 'center'
+					e.style.textOverflow = 'clip'
+					e.style.gridColumn = k
+					e.style.gridRow = 1
+					e.style.backgroundColor = 'rgba(255,255,255,.3)'
+					e.style.borderRadius = 'min(.9vw, .5em)'
+					planning_grid.append(e)
 				}
-				
-				e.style.textAlign = 'center'
-				e.style.display = 'flex'
-				e.style.height = '100%'
-				e.style.justifyContent = 'center'
-    			e.style.alignItems = 'center'
-				e.style.textOverflow = 'clip'
-				e.style.gridColumn = k
-				e.style.gridRow = 1
-				e.style.backgroundColor = 'rgba(255,255,255,.3)'
-				e.style.borderRadius = 'min(.9vw, .5em)'
-				planning_grid.append(e)
-				{
+
+				{// cours
 					const div_cours = document.createElement('div')
 					div_cours.style.position = 'relative'
 					div_cours.style.gridColumn = k
@@ -305,7 +288,13 @@
 						div_horaires.innerText = `${cour.deb[0]}h${cour.deb[1] ? cour.deb[1] : ''} - ${cour.fin[0]}h${cour.fin[1] ? cour.fin[1] : ''}`
 						//div_horaires.style.padding = 'auto'
 						//div_horaires.style.textAlign = 'center'
-						//div_horaires.style.width = '100%'
+						div_horaires.style.width = 'fit-content'
+						div_horaires.style.margin = '.2em auto'
+						div_horaires.style.padding = '0.2em'
+						div_horaires.style.transform = 'rotate(0.01turn)'
+						div_horaires.style.border = '0.1px solid rgba(200,200,200,0.5)'
+						div_horaires.style.color = 'black'
+						div_horaires.style.backgroundColor = 'rgba(255,255,255,0.99)'
 						e2.appendChild(div_horaires)
 					}
 					{
@@ -320,7 +309,7 @@
 						a.rel = "noopener noreferrer"
 						a.href = cour.prof.lien
 						a.innerText = `${cour.prof.nom}`
-						
+						a.style.color = '#3636ff'
 						e2.appendChild(a)
 					}else{
 						const a = document.createElement('div')
