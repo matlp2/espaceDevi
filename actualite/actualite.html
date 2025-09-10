@@ -163,18 +163,20 @@
 		<div
 			class="mon_content"
 		>
-			Envoyez un message à <a
-				target="_blank"
-				rel="noopener noreferrer"
-				href='mailto:SpandaWellBeing@gmail.com'
-				onclick="event.stopPropagation()"
-			>Barbara</a>
+			
 			<img
 				src="./Yoga_Ayurvedique_avec_Rhon.jpeg"
 				alt=""
 				class='centrer'
 				style="max-height: 70vh"
 			>
+			<br>
+			<br>Envoyez un message à <a
+				target="_blank"
+				rel="noopener noreferrer"
+				href='mailto:SpandaWellBeing@gmail.com'
+				onclick="event.stopPropagation()"
+			>Rhon</a>
 		</div>
 	</button>
 
@@ -1350,6 +1352,12 @@
 
 	for(var i = 0; i < expands.length; ++i) {
 		const j = i
+		expands[i].prepend(
+			new DOMParser().parseFromString(
+				`<span style='font-size: 0.85em; color: gray; margin-right: 0.5em;'>[Cliquez pour développer]</span>`,
+				"text/html"
+			).body.firstChild
+		)
 		expands[i].prepend((()=>{
 			const svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg')
 			svg.style.verticalAlign = 'middle'
