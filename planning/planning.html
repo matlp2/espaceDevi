@@ -42,7 +42,7 @@
 		font-family: 'Inter', sans-serif;
 		margin-top: 1.5em;
 		width: 100%;
-		height: 100%;
+		height: 75em;
 		display: grid;
 		grid-template-columns: repeat(6, 1fr); /* Equal width columns */
 		grid-gap: 1px;
@@ -193,13 +193,14 @@
 			planning_grid,
 			cours,
 		) {
-
 			let k = 1
 
 			for(const [nom, o] of Object.entries(jours)) {
 
 				{// jour
 					const e = document.createElement('div')
+
+					
 				
 					{
 						const e1 = document.createElement('div')
@@ -243,7 +244,7 @@
 			for(const cour of cours) {
 				min = Math.min(min, get_time(cour.deb))
 				max = Math.max(max, get_time(cour.fin))
-				console.log({min,max})
+				//console.log({min,max})
 			}
 
 			function remap(t, A, B, A2, B2) {
@@ -268,16 +269,20 @@
 				return map_retire_intervalle(
 					map_time_simple(hour_minutes),
 					[0, 1],
-					[map_time_simple([16,0]), map_time_simple([18,30])]
+					//[map_time_simple([16,0]), map_time_simple([18,30])]
+					[map_time_simple([14,0]), map_time_simple([14,0])]
 				)
 			}
-			
 
 			for(const cour of cours) {
 				const e = document.createElement('div')
 				s = e.style
 				const jour = jours[cour.jour]
 				e.style.position = 'absolute'
+				{// put on top of others when mouse over
+					e.addEventListener("mouseenter", () => { e.style.zIndex = "10" })
+					e.addEventListener("mouseleave", () => { e.style.zIndex = "" })
+				}
 				e.style.right = '0%'
 				e.style.left = '0%'
 				//const d = Math.min(max-min, 13)
@@ -328,7 +333,6 @@
 					}
 					e.append(e2)
 				}
-				
 				
 				jour.div_cours.appendChild(e)
 			}
