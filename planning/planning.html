@@ -42,7 +42,7 @@
 		font-family: 'Inter', sans-serif;
 		margin-top: 1.5em;
 		width: 100%;
-		height: 75em;
+		height: 100%;
 		display: grid;
 		grid-template-columns: repeat(6, 1fr); /* Equal width columns */
 		grid-gap: 1px;
@@ -241,6 +241,9 @@
 
 			const get_time = ([heure,minute]) => heure + minute/60
 
+
+			
+
 			for(const cour of cours) {
 				min = Math.min(min, get_time(cour.deb))
 				max = Math.max(max, get_time(cour.fin))
@@ -296,6 +299,96 @@
 			})()
 
 
+
+			// programmation dynamique
+			function minTotalDistanceWithAssignment(items, slots) {
+				const M = items.length
+				const N = slots.length
+
+				// sort for monotonicity
+				items = [...items].sort((a, b) => a.target_y - b.target_y)
+				slots = [...slots].sort((a, b) => a - b)
+
+				// dp[j][i] = min cost for first j items in first i slots
+				const dp = Array.from({ length: M + 1 }, () => Array(N + 1).fill(Infinity))
+				const choice = Array.from({ length: M + 1 }, () => Array(N + 1).fill(null))
+
+				// base case
+				for (let i = 0; i <= N; i++) dp[0][i] = 0;
+
+				for (let j = 1; j <= M; j++) {
+					for (let i = 1; i <= N; i++) {
+						// option 1: skip this slot
+						if (dp[j][i-1] < dp[j][i]) {
+							dp[j][i] = dp[j][i-1];
+							choice[j][i] = "skip";
+						}
+
+						// option 2: assign item j to slot i
+						const cost = dp[j-1][i-1] + Math.abs(items[j-1].target_y - slots[i-1]);
+						if (cost < dp[j][i]) {
+							dp[j][i] = cost;
+							choice[j][i] = "assign";
+						}
+					}
+				}
+
+				// backtrack
+				const assignment = new Array(M).fill(-1);
+				let j = M, i = N;
+				while (j > 0 && i > 0) {
+					if (choice[j][i] === "assign") {
+						assignment[j-1] = i-1; // item j-1 goes to slot i-1
+						j--;
+						i--;
+					} else {
+						i--;
+					}
+				}
+
+				return {
+					sorted_items: items,
+					cost: dp[M][N],
+					assignment, // item -> slot index
+				}
+			}
+
+
+			for(const jour of [
+				'Lundi',
+				'Mardi',
+				'Mercredi',
+				'Jeudi',
+				'Vendredi',
+				'Samedi',
+			]) {
+				const cours_du_jour = cours.filter(c => c.jour === jour)
+				const y_cours = []
+				for(const cour of cours_du_jour) {
+					const time_ratio_deb = (cour.deb[0] + cour.deb[1]/60 - min) / (max - min)
+					const time_ratio_fin = (cour.fin[0] + cour.fin[1]/60 - min) / (max - min)
+					cour.target_y = .5*(time_ratio_deb + time_ratio_fin)
+					//y_cours.push(.5*(time_ratio_deb + time_ratio_fin))
+				}
+				const y_slots = []
+				for(let i = 0; i < max_lesson_count_per_day; ++i) {
+					const step = 1 / max_lesson_count_per_day
+					const y = step * (i + .5)
+					y_slots.push(y)
+				}
+				const {
+					assignment,
+					cost,
+					sorted_items,
+				} = minTotalDistanceWithAssignment(cours_du_jour, y_slots)
+				for(let i = 0; i < assignment.length; ++i) {
+					const slot_index = assignment[i]
+					sorted_items[i].slot_index = slot_index
+				}
+			}
+			
+
+
 			const count_for_each_day = {
 				Lundi: 0,
 				Mardi: 0,
@@ -329,9 +422,10 @@
 
 				const time_ratio = (cour.deb[0] + cour.deb[1]/60 - min) / (max - min)
 				const step = 1 / max_lesson_count_per_day
-				const time_stepped = step * Math.floor(time_ratio / step)
+				//const time_stepped = step * Math.floor(time_ratio / step)
+				const time_stepped = cour.slot_index * step
 
-				const total_percent = 50
+				const total_percent = 100
 				const count = count_for_each_day[cour.jour]
 				e.style.top = (time_stepped * total_percent) + '%'
 				e.style.bottom = (100 - (time_stepped + step) * total_percent) + '%'
