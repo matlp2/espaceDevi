@@ -275,6 +275,27 @@
 			}
 
 
+			const max_lesson_count_per_day = (()=>{
+				const count_for_each_day = {
+					Lundi: 0,
+					Mardi: 0,
+					Mercredi: 0,
+					Jeudi: 0,
+					Vendredi: 0,
+					Samedi: 0,
+					Dimanche: 0,
+				}
+				for(const cour of cours) {
+					count_for_each_day[cour.jour] += 1
+				}
+				let max_count = 0
+				for(const count of Object.values(count_for_each_day)) {
+					max_count = Math.max(max_count, count)
+				}
+				return max_count
+			})()
+
+
 			const count_for_each_day = {
 				Lundi: 0,
 				Mardi: 0,
@@ -301,12 +322,19 @@
 				e.style.left = '0%'
 				//const d = Math.min(max-min, 13)
 				
-				e.style.top = 100*map_time_remove_interval(cour.deb) + '%'
-				e.style.bottom = 100*(1-map_time_remove_interval(cour.fin)) + '%'
+				//e.style.top = 100*map_time_remove_interval(cour.deb) + '%'
+				//e.style.bottom = 100*(1-map_time_remove_interval(cour.fin)) + '%'
 
+				//map_time_remove_interval(cour.deb)
+
+				const time_ratio = (cour.deb[0] + cour.deb[1]/60 - min) / (max - min)
+				const step = 1 / max_lesson_count_per_day
+				const time_stepped = step * Math.floor(time_ratio / step)
+
+				const total_percent = 50
 				const count = count_for_each_day[cour.jour]
-				e.style.top = count * 10 + '%'
-				e.style.bottom = (100 - (count + 1) * 10) + '%'
+				e.style.top = (time_stepped * total_percent) + '%'
+				e.style.bottom = (100 - (time_stepped + step) * total_percent) + '%'
 
 				e.style.textAlign = 'center'
 				//e.style.backgroundColor = cour.bg
