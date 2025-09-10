@@ -274,14 +274,28 @@
 				)
 			}
 
-			for(const cour of cours) {
+
+			const count_for_each_day = {
+				Lundi: 0,
+				Mardi: 0,
+				Mercredi: 0,
+				Jeudi: 0,
+				Vendredi: 0,
+				Samedi: 0,
+				Dimanche: 0,
+			}
+			for(const cour of cours.toSorted((a,b) => {
+				return a.deb[0] - b.deb[0] || a.deb[1] - b.deb[1]
+			})) {
 				const e = document.createElement('div')
 				s = e.style
 				const jour = jours[cour.jour]
 				e.style.position = 'absolute'
 				{// put on top of others when mouse over
+					const default_z_index = 5
+					e.style.zIndex = '' + default_z_index
 					e.addEventListener("mouseenter", () => { e.style.zIndex = "10" })
-					e.addEventListener("mouseleave", () => { e.style.zIndex = "" })
+					e.addEventListener("mouseleave", () => { e.style.zIndex = '' + default_z_index })
 				}
 				e.style.right = '0%'
 				e.style.left = '0%'
@@ -289,6 +303,11 @@
 				
 				e.style.top = 100*map_time_remove_interval(cour.deb) + '%'
 				e.style.bottom = 100*(1-map_time_remove_interval(cour.fin)) + '%'
+
+				const count = count_for_each_day[cour.jour]
+				e.style.top = count * 10 + '%'
+				e.style.bottom = (100 - (count + 1) * 10) + '%'
+
 				e.style.textAlign = 'center'
 				//e.style.backgroundColor = cour.bg
 				//e.style.fontSize = 'calc(min(1.6vw, .8em))'
@@ -335,7 +354,22 @@
 				}
 				
 				jour.div_cours.appendChild(e)
+				count_for_each_day[cour.jour] += 1
 			}
+
+			/*{// background horizontal lines
+				for(let i = 0; i < max; ++i) {
+					const e = document.createElement('div')
+					e.style.position = 'absolute'
+					e.style.left = '0%'
+					e.style.right = '0%'
+					e.style.height = '1px'
+					e.style.backgroundColor = 'rgba(0,0,0,.1)'
+					e.style.top = (100*i/21) + '%'
+					//e.style.zIndex = '-1'
+					planning_grid.appendChild(e)
+				}
+			}*/
 		}
 
 		
