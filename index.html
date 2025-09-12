@@ -2756,12 +2756,11 @@ window.addEventListener('load', () => {
 
 		for(var i = 0; i < expands.length; ++i) {
 			const j = i
-			expands[i].prepend(
-				new DOMParser().parseFromString(
-					`<span style='font-size: 0.85em; color: gray; margin-right: 0.5em;'>[Cliquez pour développer]</span>`,
-					"text/html"
-				).body.firstChild
-			)
+			const expand_msg = new DOMParser().parseFromString(
+				`<span style='font-size: 0.85em; color: gray; margin-right: 0.5em;'>[Cliquez pour développer]</span>`,
+				"text/html"
+			).body.firstChild
+			expands[i].prepend(expand_msg)
 			expands[i].prepend((()=>{
 				const svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg')
 				svg.style.verticalAlign = 'middle'
@@ -2778,11 +2777,11 @@ window.addEventListener('load', () => {
 				expands[i].mouette = svg
 				return svg
 			})())
-			expands[i].addEventListener("click", ()=>{
-				if (contents[j].style.display == 'block') {
+			const f = ()=>{
+				if (contents[j].style.display === 'block') {
 					contents[j].style.display = 'none'
 					expands[j].mouette.style.transform = `rotate(-90deg)`
-					
+					expand_msg.innerText = '[Cliquez pour développer]'
 				}else{
 					contents[j].style.display = 'block'
 					expands[j].scrollIntoView({ 
@@ -2790,8 +2789,11 @@ window.addEventListener('load', () => {
 						block: 'center',
 					});
 					expands[j].mouette.style.transform = ''
+					expand_msg.innerText = '[Cliquez pour réduire]'
 				}
-			})
+			}
+			expands[i].addEventListener("click", f)
+			f()
 		}
 
 		</script>
