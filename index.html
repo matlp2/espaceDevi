@@ -106,12 +106,53 @@
 		text-align: center;
 		padding-top: 10;
 		padding-bottom: 10;
+		
 		/*font-size: calc(min(30px,100%));*/
 	}
 </style>
 
 
 <script>
+
+
+
+
+class URL_Parameter {
+
+	/**
+	 * @param {string} key
+	 */
+	constructor(key){
+		this.key = key
+		this.value = undefined
+		this.load()
+	}
+
+	toString() {
+		return `${encodeURIComponent(this.key)}=${encodeURIComponent(this.value)}`
+	}
+
+	load(){
+		const params = new URLSearchParams(window.location.search)
+		this.value = params.get(this.key)
+		return this.value
+	}
+
+	save(){
+		const url = new URL(window.location.href)
+		if (this.value === undefined || this.value === null) {
+			url.searchParams.delete(this.key)
+		} else {
+			url.searchParams.set(this.key, this.value)
+		}
+		window.history.replaceState({}, "", url)
+	}
+}
+
+
+const url_parameter_page = new URL_Parameter('page')
+url_parameter_page.load()
+
 
 
 
@@ -145,6 +186,16 @@ class Master {
 
 	load_page(page) {
 		page.load()
+	}
+
+	load() {
+		for(const page of this.pages) {
+			if(page.name === url_parameter_page.value) {
+				this.load_page(page)
+				return
+			}
+		}
+		this.load_page(this.pages[0])
 	}
 }
 
@@ -251,6 +302,9 @@ function apply_horizontal_flex_list_style(html) {
 }
 
 
+
+
+
 class Page {
 
 	static loaded_page = undefined
@@ -261,6 +315,8 @@ class Page {
 	}
 
 	load() {
+		url_parameter_page.value = this.name
+		url_parameter_page.save()
 		if(Page.loaded_page !== undefined) {
 			Page.loaded_page.html.style.display = 'none'
 		}
@@ -323,10 +379,9 @@ class Page_Contact extends Page {
 
 window.addEventListener('load', () => {
 	const master = new Master()
+	master.load()
 	document.body.prepend(master.html)
-	master.load_page(master.pages[0])
 })
-
 
 
 
