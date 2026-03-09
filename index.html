@@ -501,13 +501,10 @@ window.addEventListener('load', () => {
 	<div
 		style="
 			text-align: left;
-			padding: 3em;
-			/*background-color: rgb(255, 226, 167);*/
+			padding: 2em;
 			background-color: #fff7b1;
-			margin-top: 10em;
 			box-shadow: 0 1px 10px 0px orange;
-			/*width: 100%;*/
-			line-height: 2em;
+			line-height: 1.5em;
 		"
 	>
 		<h3>
@@ -526,8 +523,8 @@ window.addEventListener('load', () => {
 				style="
 					color: #e75c00;
 				"
-				>
-				Espace Devi 48A, rue d'Antrain (en face du Lycée St Martin)
+			>
+					Espace Devi 48A, rue d'Antrain (en face du Lycée St Martin)
 			</a>
 		</span>
 
@@ -3258,7 +3255,7 @@ window.addEventListener('load', () => {
 				class="ma_deco"
 				alt=""
 				style="
-					height: 400px;
+					width: 80%;
 					padding: 20px;
 					margin: auto;
 				"
@@ -3282,20 +3279,25 @@ window.addEventListener('load', () => {
 						if (
 							getComputedStyle(page_contact).display !== "none"
 						) {
-							
-							if(map === undefined) {
-								map = L.map('map').setView([48.116503976351765, -1.6784383072963964], 16.5)
+							if(window.L) {
+								if(map === undefined) {
+									map = L.map('map').setView([48.116503976351765, -1.6784383072963964], 16.5)
 
-								L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-									maxZoom: 19,
-									attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-								}).addTo(map)
+									L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+										maxZoom: 19,
+										attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+									}).addTo(map)
 
-								var marker = L.marker([48.116503976351765, -1.6784383072963964]).addTo(map)
-								marker.bindPopup("<b>espaceDevi</b><br>centre de yoga").openPopup()
+									var marker = L.marker([48.116503976351765, -1.6784383072963964]).addTo(map)
+									marker.bindPopup("<b>espaceDevi</b><br>centre de yoga").openPopup()
+								}
+								else{
+									map.invalidateSize()
+								}
 							}
-							else{
-								map.invalidateSize()
+							else {
+								console.error('error from openstreetmap, not connected online ?')
+								debugger
 							}
 						}
 					});
