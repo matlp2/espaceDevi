@@ -906,13 +906,13 @@ window.addEventListener('load', () => {
 				>
 
 					<p style="text-align: left;">
-						Pandant ce voyage, les vibrations de differents instruments viennent progressivement créer 1 espace où le corps peut se relâcher et le mental se ralentir.
+						Pandant ce voyage, les vibrations de differents instruments viennent progressivement créer un espace où le corps peut se relâcher et le mental ralentir.
 					</p>
 
 					<i>
 						<p style="text-align: left;">
-							Dans l'atmosphère chaleureuse et intimiste de l'Espace Devi, je vous invite à vous allonger confortablement et simplement vous laissez porter.
-							<br>Il n'y a rien à réussir, rien à provoquer. Chacun vit sa propre expérience, à son rythme et selon ce qui est juste pour lui.
+							Dans l'atmosphère chaleureuse et intimiste de l'Espace Devi, je vous invite à vous allonger confortablement et simplement vous laisser porter.
+							Il n'y a rien à réussir, rien à provoquer. Chacun vit sa propre expérience, à son rythme et selon ce qui est juste pour lui.
 						</p>
 					</i>
 
@@ -924,8 +924,8 @@ window.addEventListener('load', () => {
 						✨ Séance découverte : 20 € au lieu de 25 €
 					</p>
 
-					<p style="text-align: left;">
-						🔄 Puis tous les 15 jours, le mardi 
+					<p style="text-align: left; size: 0.8em;">
+						🔄 Puis tous les 15 jours, le mardi soir
 					</p>
 
 					<p style="text-align: left;">
@@ -2585,8 +2585,13 @@ window.addEventListener('load', () => {
 //#region LOTUS LEAVES
 {
 
+try {
+	run_flying_lotus_leaves()
+} catch (e) {
+	console.error(e)
+	write_message(`Error: ${e}`)
+}
 
-run_flying_lotus_leaves()
 
 
 
