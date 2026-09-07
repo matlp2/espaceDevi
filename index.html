@@ -874,6 +874,97 @@ window.addEventListener('load', () => {
 
 
 
+		<button
+			class="mon_container"
+		>
+
+			<div class="mon_header">
+				<b>Séance découverte:</b> Voyage donore avec Fabian mardi le 15 septembre de 20h15 à 21h45.
+			</div>
+				
+			<div
+				class="mon_content"
+			>
+
+				<img
+					src="actualite/chant védique.jpg"
+					alt=""
+					class='centrer'
+					style="max-height: 70vh"
+				>
+
+				<div
+					type="
+						text-align: left;
+
+					"
+				>
+
+					<p style="text-align: left;">
+						Pandant ce voyage, les vibrations de differents instruments viennent progressivement créer 1 espace où le corps peut se relâcher et le mental se ralentir.
+					</p>
+
+					<i>
+						<p style="text-align: left;">
+							Dans l'atmosphère chaleureuse et intimiste de l'Espace Devi, je vous invite à vous allonger confortablement et simplement vous laissze porter.
+							<br>Il n'y a rien à réussir, rien à provoquer. Chacun vit sa propre expérience, à son rythme et selon ce qui est juste pour lui.
+						</p>
+					</i>
+
+					<p style="text-align: left;">
+						Fabian anime les bains sonores depuis 2024.
+					</p>
+
+					<p style="text-align: left;">
+						✨ Séance découverte : 20 € au lieu de 25 €
+					</p>
+
+					<p style="text-align: left;">
+						🔄 Puis tous les 15 jours, le mardi 
+					</p>
+
+					<p style="text-align: left;">
+						⚠ Réservation obligatoire
+					</p>
+
+					<p style="text-align: left;"> 
+						📞 07 82 57 67 10
+					</p>
+
+					<p style="text-align: left;">
+						📩 <a
+							target="_blank"
+							rel="noopener noreferrer"
+							href='mailto:martineau.fabian.pro@gmail.com'
+							onclick="event.stopPropagation()"
+						>martineau.fabian.pro@gmail.com</a>
+					</p>
+
+					<p style="text-align: left;">
+						ou directement sur FRIMAKE (site de sortie et activité) 
+					</p>
+
+					<p style="text-align: left;">
+						Fabian Martineau – Un Instant pour Soi
+					</p>
+
+				</div>
+
+			</div>
+			
+		</button>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 		<button
@@ -3249,53 +3340,61 @@ async function run_flying_lotus_leaves() {
 	document.body.prepend(canvas)
  
 	function frame() {
- 
-		const time_seconds = (performance.now() - start_time) / 1000
 
-		// update the uniform buffer with the current time each frame
-		const uniform_data = new Float32Array([time_seconds, 0, 0, 0, ...projection.m, ...view.m]) // padded to 16 bytes
-		device.queue.writeBuffer(uniform_buffer, 0, uniform_data)
+		try {
+			
+			const time_seconds = (performance.now() - start_time) / 1000
 
-		const command_encoder = device.createCommandEncoder()
-		const texture_view = context.getCurrentTexture().createView()
+			// update the uniform buffer with the current time each frame
+			const uniform_data = new Float32Array([time_seconds, 0, 0, 0, ...projection.m, ...view.m]) // padded to 16 bytes
+			device.queue.writeBuffer(uniform_buffer, 0, uniform_data)
 
-		dispatch_move_squares(command_encoder, time_seconds)
-		dispatch_compute_squares(command_encoder) // fills the vertex buffer this frame
+			const command_encoder = device.createCommandEncoder()
+			const texture_view = context.getCurrentTexture().createView()
+
+			dispatch_move_squares(command_encoder, time_seconds)
+			dispatch_compute_squares(command_encoder) // fills the vertex buffer this frame
 
 
-		
+			
 
-		const render_pass = command_encoder.beginRenderPass({
-			colorAttachments: [
-				{
-					view: texture_view,
-					clearValue: {
-						r: 0.05,
-						g: 0.05,
-						b: 0.07,
-						a: 0,
+			const render_pass = command_encoder.beginRenderPass({
+				colorAttachments: [
+					{
+						view: texture_view,
+						clearValue: {
+							r: 0.05,
+							g: 0.05,
+							b: 0.07,
+							a: 0,
+						},
+						loadOp: 'clear',
+						storeOp: 'store',
 					},
-					loadOp: 'clear',
-					storeOp: 'store',
+					
+				],
+				depthStencilAttachment: {
+					view: depth_texture.createView(),
+					depthClearValue: 0.0, // see note below — differs for inverted depth
+					depthLoadOp: 'clear',
+					depthStoreOp: 'store',
 				},
-				
-			],
-			depthStencilAttachment: {
-				view: depth_texture.createView(),
-				depthClearValue: 0.0, // see note below — differs for inverted depth
-				depthLoadOp: 'clear',
-				depthStoreOp: 'store',
-			},
-		})
+			})
 
-		render_pass.setPipeline(pipeline)
-		render_pass.setBindGroup(0, bind_group)
-		render_pass.draw(total_vertex_count) // read straight from the vertex buffer, no instancing
+			render_pass.setPipeline(pipeline)
+			render_pass.setBindGroup(0, bind_group)
+			render_pass.draw(total_vertex_count) // read straight from the vertex buffer, no instancing
 
-		render_pass.end()
-		device.queue.submit([command_encoder.finish()])
+			render_pass.end()
+			device.queue.submit([command_encoder.finish()])
 
-		requestAnimationFrame(frame)
+			requestAnimationFrame(frame)
+
+		} catch (e) {
+			console.error(e)
+			canvas.remove()
+		}
+ 
 	}
  
 	requestAnimationFrame(frame)
