@@ -2484,6 +2484,1040 @@ window.addEventListener('load', () => {
 
 
 
+<script>
+
+//#region LOTUS LEAVES
+
+run_flying_lotus_leaves()
+
+
+
+async function run_flying_lotus_leaves() {
+
+	const canvas = /** @type {HTMLCanvasElement} */(document.createElement('canvas'))
+
+	canvas.style.pointerEvents = 'none'
+	canvas.style.width = '100%'
+	canvas.style.height = '100%'
+
+	canvas.style.position = 'relative'
+
+	
+ 
+	if (!navigator.gpu) {
+		write_message('WebGPU is not supported in this browser.')
+		return
+	}
+ 
+	const adapter = await navigator.gpu.requestAdapter()
+	if (!adapter) {
+		write_message('No suitable GPU adapter found.')
+		throw new Error('No GPU adapter')
+	}
+ 
+	const device = await adapter.requestDevice()
+ 
+	const context = /** @type {GPUCanvasContext} */(canvas.getContext('webgpu'))
+
+	if(context == null) {
+		write_message(`webgpu context`)
+		return
+	}
+
+	
+	
+ 
+	const format = navigator.gpu.getPreferredCanvasFormat()
+ 
+	context.configure({
+		device,
+		format,
+		alphaMode: 'premultiplied',
+	})
+
+
+	const leaf_texture = await ASYNC_load_texture_from_url(
+		device,
+		`assets/lotus_leaf.png`
+	)
+
+	/** @type {GPUTexture} */
+	let depth_texture
+
+	function fix_depth_texture_size() {
+		depth_texture?.destroy()
+		depth_texture = device.createTexture({
+			size: [canvas.width, canvas.height, 1],
+			format: 'depth24plus',
+			usage: GPUTextureUsage.RENDER_ATTACHMENT,
+		})
+	}
+
+	resize_canvas_to_display_size(device, canvas)
+	fix_depth_texture_size()
+ 
+
+	observe_canvas_resize(device, canvas, () => {
+		fix_depth_texture_size()
+	})
+
+
+	const INSTANCE_COUNT = 50
+	const MATRIX_BYTE_SIZE = 64 // 4x4 floats * 4 bytes
+	const model_matrix_array_buffer = device.createBuffer({
+		size: INSTANCE_COUNT * MATRIX_BYTE_SIZE,
+		usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+	})
+
+	const speed_array_buffer = device.createBuffer({
+		size: INSTANCE_COUNT * 4 * 4,
+		usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+	})
+
+	//const attraction_point_center_of_
+
+
+	
+	// #region INIT BASES
+	{
+
+		// compute shader initializing the matrix array
+		const init_matrices_shader_module = device.createShaderModule({ code: /* wgsl */ `
+	
+			struct Params {
+				instance_count: u32,
+				seed: f32,
+			}
+
+			@group(0) @binding(0) var<storage, read_write> model_matrices: array<mat4x4<f32>>;
+			@group(0) @binding(1) var<uniform> params: Params;
+			@group(0) @binding(2) var<storage, read_write> speed_arr: array<vec4<f32>>;
+
+			// simple hash-based pseudo-random generator, seeded by an integer + a float seed.
+			// returns a value in [0, 1).
+			fn hash(n: u32) -> f32 {
+				var x = n;
+				x = (x << 13u) ^ x;
+				x = x * (x * x * 15731u + 789221u) + 1376312589u;
+				return f32(x & 0x7fffffffu) / f32(0x7fffffff);
+			}
+
+
+			fn make_rotation_matrix(u: vec3<f32>, teta: f32) -> mat3x3<f32> {
+
+				let axis = normalize(u);
+				let c = cos(teta);
+				let s = sin(teta);
+				let t = 1.0 - c;
+
+				let x = axis.x;
+				let y = axis.y;
+				let z = axis.z;
+				
+				return mat3x3<f32>(
+					t * x * x + c,       t * x * y + s * z,   t * x * z - s * y,
+					t * x * y - s * z,   t * y * y + c,       t * y * z + s * x,
+					t * x * z + s * y,   t * y * z - s * x,   t * z * z + c,
+				);
+			}
+
+			const PI: f32 = 3.14159265359;
+
+			fn random_unit_vector(index: u32) -> vec3<f32> {
+				let z = hash(index * 3u + 0u + bitcast<u32>(params.seed)) * 2.0 - 1.0;
+				let phi = hash(index * 3u + 1u + bitcast<u32>(params.seed)) * 2.0 * PI;
+				let r = sqrt(max(0.0, 1.0 - z * z));
+				let x = r * cos(phi);
+				let y = r * sin(phi);
+				return vec3<f32>(x, y, z);
+			}
+
+			@compute @workgroup_size(64)
+			fn cs_main(@builtin(global_invocation_id) global_id: vec3<u32>) {
+
+				let index = global_id.x;
+
+				// bounds check — workgroup dispatch is rounded up to a multiple of
+				// workgroup_size, so the last workgroup can have out-of-range indices
+				if (index >= params.instance_count) {
+					return;
+				}
+
+				// random positions in the range 0..1, decorrelated per-component
+				// by mixing in different offsets before hashing
+				//let x = 10 * (hash(index * 3u + 0u + bitcast<u32>(params.seed)) - 0.5);
+				//let y = 10 * (hash(index * 3u + 1u + bitcast<u32>(params.seed)) - 0.5);
+				//let z = 10 * (hash(index * 3u + 2u + bitcast<u32>(params.seed)) - 0.5);
+
+
+				//let p = vec3<f32>(0,0,-10) + 10 * random_unit_vector(index * 3u);
+				let p = 10 * (1 + hash(index * 3u + 0u + bitcast<u32>(params.seed))) * random_unit_vector(index * 3u);
+
+				model_matrices[index] = mat4x4<f32>(
+					1.0, 0.0, 0.0, 0.0, // column 0
+					0.0, 1.0, 0.0, 0.0, // column 1
+					0.0, 0.0, 1.0, 0.0, // column 2
+					p.x,   p.y,   p.z,   1.0, // column 3
+				);
+
+
+				// random deltas between -1 and 1: hash gives [0,1), so *2 - 1 remaps it
+				var rand_dx = hash(index * 3u + 0u + bitcast<u32>(params.seed)) * 2.0 - 1.0;
+				var rand_dy = hash(index * 3u + 1u + bitcast<u32>(params.seed)) * 2.0 - 1.0;
+				var rand_dz = hash(index * 3u + 2u + bitcast<u32>(params.seed)) * 2.0 - 1.0;
+
+				let len = length(vec3<f32>(rand_dx, rand_dy, rand_dz));
+
+				rand_dx = rand_dx / len;
+				rand_dy = rand_dy / len;
+				rand_dz = rand_dz / len;
+
+				speed_arr[index] = vec4<f32>(rand_dx, rand_dy, rand_dz, 0.0);
+				speed_arr[index] = vec4<f32>(
+					random_unit_vector((${INSTANCE_COUNT} + index) * 3u),
+					0.0
+				);
+
+				{// apply random rotation
+					let random_axis = random_unit_vector(index * 3u);
+					let random_angle = 2 * PI * hash(index * 3u + bitcast<u32>(params.seed));
+					let random_rotation = make_rotation_matrix(random_axis, random_angle);
+					let random_rotation_base = mat4x4<f32>(
+						vec4<f32>(random_rotation[0], 0.0),
+						vec4<f32>(random_rotation[1], 0.0),
+						vec4<f32>(random_rotation[2], 0.0),
+						vec4<f32>(0.0, 0.0, 0.0, 1.0),
+					);
+					model_matrices[index] = model_matrices[index] * random_rotation_base;
+				}
+
+			}
+
+			`
+		})
+
+		const compute_pipeline = device.createComputePipeline({
+			layout: 'auto',
+			compute: {
+				module: init_matrices_shader_module,
+				entryPoint: 'cs_main',
+			},
+		})
+
+		const params_buffer = device.createBuffer({
+			size: 16, // u32 + f32, padded to 16 bytes
+			usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+		})
+		device.queue.writeBuffer(params_buffer, 0, new Uint32Array([INSTANCE_COUNT, 0]))
+		device.queue.writeBuffer(params_buffer, 4, new Float32Array([Math.random() * 1000]))
+
+		const compute_bind_group = device.createBindGroup({
+			layout: compute_pipeline.getBindGroupLayout(0),
+			entries: [
+				{ binding: 0, resource: { buffer: model_matrix_array_buffer } },
+				{ binding: 1, resource: { buffer: params_buffer } },
+				{ binding: 2, resource: { buffer: speed_array_buffer } },
+			],
+		})
+
+		// run once (e.g. at init) — dispatch enough workgroups to cover all instances
+		const command_encoder = device.createCommandEncoder()
+		const pass = command_encoder.beginComputePass()
+		pass.setPipeline(compute_pipeline)
+		pass.setBindGroup(0, compute_bind_group)
+		pass.dispatchWorkgroups(Math.ceil(INSTANCE_COUNT / 64))
+		pass.end()
+		device.queue.submit([command_encoder.finish()])
+	}
+	// #endregion
+
+
+
+
+	//#region GEOMETRY PASS
+
+	const V3_BYTE_SIZE = 3 *8
+	const V2_BYTE_SIZE = 2 *8
+	const VERTICES_PER_INSTANCE = 6
+	const vertex_buffer = device.createBuffer({
+		size: VERTICES_PER_INSTANCE * INSTANCE_COUNT * V3_BYTE_SIZE,
+		usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+	})
+
+	const uv_buffer = device.createBuffer({
+		size: VERTICES_PER_INSTANCE * INSTANCE_COUNT * V2_BYTE_SIZE,
+		usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+	})
+
+	// acts like the geometry pass for a GL shader; for each model_matrix: one square === 2 triangles === 6 vertices
+	const shader_module_fill_vertex_buffer = device.createShaderModule({ code: /* wgsl */ `
+
+		struct Params {
+			instance_count: u32,
+		}
+
+		@group(0) @binding(0) var<storage, read> model_matrices: array<mat4x4<f32>>;
+		@group(0) @binding(1) var<storage, read_write> output_vertices: array<vec4<f32>>;
+		@group(0) @binding(2) var<uniform> params: Params;
+		@group(0) @binding(3) var<storage, read_write> output_uvs: array<vec2<f32>>;
+
+		@compute @workgroup_size(64)
+		fn cs_main(@builtin(global_invocation_id) global_id: vec3<u32>) {
+
+			let index = global_id.x;
+
+			if (index >= params.instance_count) {
+				return;
+			}
+
+			let base = model_matrices[index];
+
+			let ratio = 3.0/2.0;
+
+			// a unit quad, centered at origin, split into 2 triangles = 6 vertices
+			var corners = array<vec2<f32>, 6>(
+				vec2f(-0.5*ratio, -0.5), vec2f(0.5*ratio, -0.5), vec2f(0.5*ratio, 0.5), // triangle 1
+				vec2f(-0.5*ratio, -0.5), vec2f(0.5*ratio, 0.5), vec2f(-0.5*ratio, 0.5), // triangle 2
+			);
+
+			// corresponding UVs for each corner above, in the same order.
+			// mapping: (-0.5,-0.5) -> (0,0), (0.5,-0.5) -> (1,0), (0.5,0.5) -> (1,1), (-0.5,0.5) -> (0,1)
+			var uvs = array<vec2<f32>, 6>(
+				vec2f(0.0, 0.0), vec2f(1.0, 0.0), vec2f(1.0, 1.0), // triangle 1
+				vec2f(0.0, 0.0), vec2f(1.0, 1.0), vec2f(0.0, 1.0), // triangle 2
+			);
+
+			let out_base = index * 6u;
+
+			for (var i = 0u; i < 6u; i = i + 1u) {
+				let local = vec4f(corners[i], 0.0, 1.0);
+				output_vertices[out_base + i] = base * local;
+				output_uvs[out_base + i] = uvs[i];
+			}
+
+		}`
+	})
+
+	const compute_pipeline_squares_pipeline = device.createComputePipeline({
+		layout: 'auto',
+		compute: {
+			module: shader_module_fill_vertex_buffer,
+			entryPoint: 'cs_main',
+		},
+	})
+
+	const params_buffer = device.createBuffer({
+		size: 16,
+		usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+	})
+	device.queue.writeBuffer(params_buffer, 0, new Uint32Array([INSTANCE_COUNT, 0, 0, 0]))
+
+	const compute_squares_bind_group = device.createBindGroup({
+		layout: compute_pipeline_squares_pipeline.getBindGroupLayout(0),
+		entries: [
+			{ binding: 0, resource: { buffer: model_matrix_array_buffer } },
+			{ binding: 1, resource: { buffer: vertex_buffer } },
+			{ binding: 2, resource: { buffer: params_buffer } },
+			{ binding: 3, resource: { buffer: uv_buffer } },
+		],
+	})
+
+	// call every frame (or whenever model_matrix_array_buffer changes)
+	/** @param {GPUCommandEncoder} command_encoder */
+	function dispatch_compute_squares(
+		command_encoder,
+	) {
+		const pass = command_encoder.beginComputePass()
+		pass.setPipeline(compute_pipeline_squares_pipeline)
+		pass.setBindGroup(0, compute_squares_bind_group)
+		pass.dispatchWorkgroups(Math.ceil(INSTANCE_COUNT / 64))
+		pass.end()
+	}
+	//#endregion GEOMETRY PASS
+
+
+ 
+	
+	//#region MOVE SQUARES
+
+	const move_squares_shader_module = device.createShaderModule({ code: /* wgsl */ `
+		struct Params {
+			instance_count: u32,
+			time: f32,
+			dt: f32,
+		}
+
+		@group(0) @binding(0) var<storage, read_write> model_matrices: array<mat4x4<f32>>;
+		@group(0) @binding(1) var<uniform> params: Params;
+		@group(0) @binding(2) var<storage, read_write> speed_arr: array<vec4<f32>>;
+
+		// simple hash-based pseudo-random generator, seeded by an integer + a float seed.
+		// returns a value in [0, 1).
+		fn hash(n: u32) -> f32 {
+			var x = n;
+			x = (x << 13u) ^ x;
+			x = x * (x * x * 15731u + 789221u) + 1376312589u;
+			return f32(x & 0x7fffffffu) / f32(0x7fffffff);
+		}
+
+		fn make_rotation_matrix(u: vec3<f32>, teta: f32) -> mat3x3<f32> {
+
+			let axis = normalize(u);
+			let c = cos(teta);
+			let s = sin(teta);
+			let t = 1.0 - c;
+
+			let x = axis.x;
+			let y = axis.y;
+			let z = axis.z;
+			
+			return mat3x3<f32>(
+				t * x * x + c,       t * x * y + s * z,   t * x * z - s * y,
+				t * x * y - s * z,   t * y * y + c,       t * y * z + s * x,
+				t * x * z + s * y,   t * y * z - s * x,   t * z * z + c,
+			);
+		}
+
+		const PI: f32 = 3.14159265359;
+
+		fn random_unit_vector(index: u32, seed: u32) -> vec3<f32> {
+			let z = hash(index * 2u + 0u + seed) * 2.0 - 1.0;
+			let phi = hash(index * 2u + 1u + seed) * 2.0 * PI;
+			let r = sqrt(max(0.0, 1.0 - z * z));
+			let x = r * cos(phi);
+			let y = r * sin(phi);
+			return vec3<f32>(x, y, z);
+		}
+
+		@compute @workgroup_size(64)
+		fn cs_main(@builtin(global_invocation_id) global_id: vec3<u32>) {
+
+			let index = global_id.x;
+
+			let dt = min(0.01, params.dt);
+
+			if (index >= params.instance_count) {
+				return;
+			}
+
+			// seed mixes in time so the "random" direction changes over time
+			// rather than staying frozen forever per-instance
+			let time_seed = bitcast<u32>(params.time);
+
+			// random deltas between -1 and 1: hash gives [0,1), so *2 - 1 remaps it
+			var rand_dx = hash(index * 3u + 0u + time_seed) * 2.0 - 1.0;
+			var rand_dy = hash(index * 3u + 1u + time_seed) * 2.0 - 1.0;
+			var rand_dz = hash(index * 3u + 2u + time_seed) * 2.0 - 1.0;
+
+
+			if(false) {// attraction to rotating point
+
+				let R = 40.0;
+
+				let angle = 0.2 * params.time;
+
+				//let p_1 = vec4(R * cos(angle), R * sin(angle), 0.0, 0.0);
+				let p_1 = vec4(
+					R * sin(-angle),
+					0.1 * R + 0.2 * R * cos(5*angle),
+					R * cos(angle),
+					0.0
+				);
+
+				let delta = dt * normalize(p_1 - model_matrices[index][3]);
+
+				speed_arr[index] = speed_arr[index] + delta;
+			}
+
+			{// limit speed
+
+				let speed_len = length(speed_arr[index]);
+				speed_arr[index] = speed_arr[index] - 0.0006 * speed_len * speed_len * normalize(speed_arr[index]);
+
+			}
+
+			{// rotate around
+				let p = model_matrices[index][3].xyz;
+				let up = vec3<f32>(0.0, 1.0, 0.0);
+				let dir = normalize(cross(p, up));
+
+				// model_matrices[index][3].x = p.x + dt * dir.x;
+				// model_matrices[index][3].y = p.y + dt * dir.y;
+				// model_matrices[index][3].z = p.z + dt * dir.z;
+
+				speed_arr[index].x = speed_arr[index].x + dt * dir.x;
+				speed_arr[index].y = speed_arr[index].y + dt * dir.y;
+				speed_arr[index].z = speed_arr[index].z + dt * dir.z;
+			}
+
+			{ // keep at a the same distance
+				let p = model_matrices[index][3].xyz;
+				let not_up_1 = vec3<f32>(1.0, 0.0, 0.0);
+				let not_up_2 = vec3<f32>(0.0, 0.0, 1.0);
+				let proj = dot(p, not_up_1)*not_up_1 + dot(p, not_up_2)*not_up_2;
+				let dir = normalize(proj);
+				var delta = 20.0 - length(proj);
+
+				// borne delta entre -5 et 5
+				if(delta < -5) { delta = -5; }
+				if(delta > 5) { delta = 5; }
+
+				speed_arr[index].x = speed_arr[index].x + dt * delta * dir.x;
+				speed_arr[index].y = speed_arr[index].y + dt * delta * dir.y;
+				speed_arr[index].z = speed_arr[index].z + dt * delta * dir.z;
+			}
+			
+
+			{// apply random rotation
+				let random_axis = random_unit_vector(index, time_seed);
+				let random_angle = 1.1 * dt * hash(index + time_seed);
+				let random_rotation = make_rotation_matrix(random_axis, random_angle);
+				let random_rotation_base = mat4x4<f32>(
+					vec4<f32>(random_rotation[0], 0.0),
+					vec4<f32>(random_rotation[1], 0.0),
+					vec4<f32>(random_rotation[2], 0.0),
+					vec4<f32>(0.0, 0.0, 0.0, 1.0),
+				);
+				model_matrices[index] = model_matrices[index] * random_rotation_base;
+			}
+
+			{// normalize rotations
+				var c0 = model_matrices[index][0].xyz;
+				var c1 = model_matrices[index][1].xyz;
+				var c2 = model_matrices[index][2].xyz;
+
+				c0 = normalize(c0);
+				c1 = normalize(c1 - dot(c1, c0) * c0);
+				c2 = cross(c0, c1);
+
+				model_matrices[index][0] = vec4<f32>(c0, 0.0);
+				model_matrices[index][1] = vec4<f32>(c1, 0.0);
+				model_matrices[index][2] = vec4<f32>(c2, 0.0);
+			}
+
+			let len = length(vec3<f32>(rand_dx, rand_dy, rand_dz));
+
+			rand_dx = rand_dx / len;
+			rand_dy = rand_dy / len;
+			rand_dz = rand_dz / len;
+
+			let dir = speed_arr[index];
+
+			model_matrices[index][3].x = model_matrices[index][3].x + 0.03 * rand_dx * dt + dir.x * dt;
+			model_matrices[index][3].y = model_matrices[index][3].y + 0.03 * rand_dy * dt + dir.y * dt;
+			model_matrices[index][3].z = model_matrices[index][3].z + 0.03 * rand_dz * dt + dir.z * dt;
+
+			let box_size = 10.0;
+
+			//if(model_matrices[index][3].x > 0.5 * box_size) { model_matrices[index][3].x = model_matrices[index][3].x - 0.5 * box_size; }
+			//if(model_matrices[index][3].x <-0.5 * box_size) { model_matrices[index][3].x = model_matrices[index][3].x + 0.5 * box_size; }
+			//if(model_matrices[index][3].y > 0.5 * box_size) { model_matrices[index][3].y = model_matrices[index][3].y - 0.5 * box_size; }
+			//if(model_matrices[index][3].y <-0.5 * box_size) { model_matrices[index][3].y = model_matrices[index][3].y + 0.5 * box_size; }
+			//if(model_matrices[index][3].z > 0.5 * box_size) { model_matrices[index][3].z = model_matrices[index][3].z - 0.5 * box_size; }
+			//if(model_matrices[index][3].z <-0.5 * box_size) { model_matrices[index][3].z = model_matrices[index][3].z + 0.5 * box_size; }
+		}`
+	})
+
+	const move_squares_pipeline = device.createComputePipeline({
+		layout: 'auto',
+		compute: {
+			module: move_squares_shader_module,
+			entryPoint: 'cs_main',
+		},
+	})
+
+	// dedicated params buffer for this shader: {instance_count: u32, time: f32, dt: f32}
+	// = 12 bytes of real data, but uniform buffers still need 16-byte alignment
+	const move_squares_params_buffer = device.createBuffer({
+		size: 16,
+		usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+	})
+
+	const move_squares_bind_group = device.createBindGroup({
+		layout: move_squares_pipeline.getBindGroupLayout(0),
+		entries: [
+			{ binding: 0, resource: { buffer: model_matrix_array_buffer } },
+			{ binding: 1, resource: { buffer: move_squares_params_buffer } },
+			{ binding: 2, resource: { buffer: speed_array_buffer } },
+		],
+	})
+
+	// call every frame — writes {instance_count, time, dt} into the params
+	// buffer, then dispatches the move shader against model_matrix_array_buffer
+	let last_time_seconds = 0
+
+	/**
+	 * @param {GPUCommandEncoder} command_encoder
+	 * @param {number} time_seconds
+	 */
+	function dispatch_move_squares(command_encoder, time_seconds) {
+
+		const dt = time_seconds - last_time_seconds
+		last_time_seconds = time_seconds
+
+		device.queue.writeBuffer(
+			move_squares_params_buffer,
+			0,
+			new Uint32Array([INSTANCE_COUNT]) // instance_count (u32) at offset 0
+		)
+		device.queue.writeBuffer(
+			move_squares_params_buffer,
+			4,
+			new Float32Array([time_seconds, dt]) // time (f32) at offset 4, dt (f32) at offset 8
+		)
+
+		const pass = command_encoder.beginComputePass()
+		pass.setPipeline(move_squares_pipeline)
+		pass.setBindGroup(0, move_squares_bind_group)
+		pass.dispatchWorkgroups(Math.ceil(INSTANCE_COUNT / 64))
+		pass.end()
+	}
+	
+	//#endregion
+
+
+
+
+	const shader_module = device.createShaderModule({ code: /* wgsl */ `
+
+		struct Uniforms {
+			time: f32,
+			Projection: mat4x4<f32>,
+			View: mat4x4<f32>,
+		}
+
+		@group(0) @binding(0) var<uniform> uniforms: Uniforms;
+		@group(0) @binding(1) var<storage, read> vertices: array<vec4<f32>>;
+		@group(0) @binding(2) var tx_sampler: sampler;
+		@group(0) @binding(3) var tx: texture_2d<f32>;
+		@group(0) @binding(4) var<storage, read> uvs: array<vec2<f32>>;
+
+		struct VertexOut {
+			@builtin(position) position: vec4f,
+			@location(0) uv: vec2f,
+		}
+
+		@vertex
+		fn vs_main(@builtin(vertex_index) vertex_index: u32) -> VertexOut {
+
+			var out: VertexOut;
+			out.position = uniforms.Projection * uniforms.View * vertices[vertex_index];
+			out.uv = out.position.xy * 0.5 + vec2f(0.5, 0.5);
+			out.uv = uvs[vertex_index];//out.position.xy * 0.5 + vec2f(0.5, 0.5);
+			return out;
+		}
+
+		@fragment
+		fn fs_main(in: VertexOut) -> @location(0) vec4f {
+
+			// animate color using the time uniform passed in from JS
+			let r = 0.5 + 0.5 * sin(uniforms.time);
+			let g = 0.5 + 0.5 * sin(uniforms.time + 2.0);
+			let b = 0.5 + 0.5 * sin(uniforms.time + 4.0);
+
+			var color = textureSample(tx, tx_sampler, in.uv);
+
+			color.a = 0.85 * color.a;
+
+			if(color.a <= 0.0) {
+				discard;
+			}
+
+			return color;
+
+			// return vec4f(
+			// 	r * in.uv.x,
+			// 	g * in.uv.y,
+			// 	b,
+			// 	1.0
+			// );
+		}
+		`
+	})
+
+
+	const texture_sampler = device.createSampler({
+		magFilter: 'linear',
+		minFilter: 'linear',
+	})
+
+
+
+	const bind_group_layout = device.createBindGroupLayout({
+		entries: [
+			{
+				binding: 0,
+				visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
+				buffer: { type: 'uniform' },
+			},
+			{
+				binding: 1,
+				visibility: GPUShaderStage.VERTEX,
+				buffer: { type: 'read-only-storage' },
+			},
+			{
+				binding: 2,
+				visibility: GPUShaderStage.FRAGMENT,
+				sampler: {},
+			},
+			{
+				binding: 3,
+				visibility: GPUShaderStage.FRAGMENT,
+				texture: {},
+			},
+			{
+				binding: 4,
+				visibility: GPUShaderStage.VERTEX,
+				buffer: { type: 'read-only-storage' },
+			},
+		],
+	})
+
+	// uniform buffer: one f32 (time), padded to 16 bytes (min uniform binding size)
+	const uniform_buffer = device.createBuffer({
+		size: 4 * 4 + MATRIX_BYTE_SIZE + MATRIX_BYTE_SIZE,
+		usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+	})
+ 
+	const bind_group = device.createBindGroup({
+		layout: bind_group_layout,
+		entries: [
+			{ binding: 0, resource: { buffer: uniform_buffer } },
+			{ binding: 1, resource: { buffer: vertex_buffer } },
+			{ binding: 2, resource: texture_sampler },
+			{ binding: 3, resource: leaf_texture.createView() },
+			{ binding: 4, resource: { buffer: uv_buffer } },
+		],
+	})
+
+	const pipeline = device.createRenderPipeline({
+		layout: device.createPipelineLayout({ bindGroupLayouts: [bind_group_layout] }),
+		vertex: {
+			module: shader_module,
+			entryPoint: 'vs_main',
+		},
+		fragment: {
+			module: shader_module,
+			entryPoint: 'fs_main',
+			targets: [{ format }],
+		},
+		primitive: {
+			topology: 'triangle-list',
+		},
+		depthStencil: {
+			format: 'depth24plus',
+			depthWriteEnabled: true,
+			depthCompare: 'greater', // inverted: farther fragments win instead of nearer ones
+		},
+	})
+
+
+
+	//#region PROJECTION
+	const projection = new Projection_Matrix
+	function update_projection_aspect_ratio() {
+		projection.set_aspect_ratio(canvas.width, canvas.height)
+	}
+	update_projection_aspect_ratio()
+	on_resize_canvas(
+		canvas,
+		()=>{update_projection_aspect_ratio()}
+	)
+	//#endregion PROJECTION
+
+
+	const cam_base = new Base
+	cam_base.translate_me([
+		0,//1 * (Math.random() - 0.5),
+		0,//1 * (Math.random() - 0.5),
+		10,// + 1 * (Math.random() - 0.5),
+	])
+	const view = cam_base.get_invert()
+	
+
+	
+	// total vertex count = one quad per instance, 6 vertices per quad —
+	// this replaces the old instance-based draw(3, instance_count) call,
+	// since positions are now precomputed per-vertex by the compute pass
+	const total_vertex_count = INSTANCE_COUNT * VERTICES_PER_INSTANCE
+
+	const start_time = performance.now()
+
+	document.body.prepend(canvas)
+ 
+	function frame() {
+ 
+		const time_seconds = (performance.now() - start_time) / 1000
+
+		// update the uniform buffer with the current time each frame
+		const uniform_data = new Float32Array([time_seconds, 0, 0, 0, ...projection.m, ...view.m]) // padded to 16 bytes
+		device.queue.writeBuffer(uniform_buffer, 0, uniform_data)
+
+		const command_encoder = device.createCommandEncoder()
+		const texture_view = context.getCurrentTexture().createView()
+
+		dispatch_move_squares(command_encoder, time_seconds)
+		dispatch_compute_squares(command_encoder) // fills the vertex buffer this frame
+
+
+		
+
+		const render_pass = command_encoder.beginRenderPass({
+			colorAttachments: [
+				{
+					view: texture_view,
+					clearValue: {
+						r: 0.05,
+						g: 0.05,
+						b: 0.07,
+						a: 0,
+					},
+					loadOp: 'clear',
+					storeOp: 'store',
+				},
+				
+			],
+			depthStencilAttachment: {
+				view: depth_texture.createView(),
+				depthClearValue: 0.0, // see note below — differs for inverted depth
+				depthLoadOp: 'clear',
+				depthStoreOp: 'store',
+			},
+		})
+
+		render_pass.setPipeline(pipeline)
+		render_pass.setBindGroup(0, bind_group)
+		render_pass.draw(total_vertex_count) // read straight from the vertex buffer, no instancing
+
+		render_pass.end()
+		device.queue.submit([command_encoder.finish()])
+
+		requestAnimationFrame(frame)
+	}
+ 
+	requestAnimationFrame(frame)
+}
+
+
+
+
+/** @param {string} msg */
+function write_message(
+	msg,
+) {
+	console.log(msg)
+}
+
+
+
+/**
+ * Claude:
+ * Watches the canvas's displayed (CSS) size and keeps its backing buffer
+ * in sync. WebGPU's context automatically targets whatever size the
+ * canvas attributes currently are, so re-configuring isn't required here
+ * (no depth/multisample textures are used in this demo) — but if you add
+ * a depth buffer or any other size-dependent GPU resource, recreate it
+ * inside this callback too, since a stale depth texture won't match the
+ * new color texture's dimensions and beginRenderPass will throw.
+ * @param {GPUDevice} device
+ * @param {HTMLCanvasElement} canvas
+ * @param {() => void} [on_resize] called after the canvas backing size actually changes
+ */
+function observe_canvas_resize(device, canvas, on_resize) {
+ 
+	const observer = new ResizeObserver((entries) => {
+		for (const entry of entries) {
+			// devicePixelContentBoxSize is the most accurate (accounts for dpr
+			// and borders/scrollbars), but isn't supported everywhere yet —
+			// fall back to clientWidth/clientHeight via resize_canvas_to_display_size.
+			const changed = resize_canvas_to_display_size(device, canvas)
+			//if (changed && on_resize) on_resize()
+			
+		}
+		on_resize?.()
+	})
+ 
+	observer.observe(canvas)
+	return observer
+}
+
+
+/**
+ * @param {HTMLCanvasElement} canvas
+ * @param {() => void} [f]
+ */
+function on_resize_canvas(
+	canvas,
+	f,
+) {
+	const observer = new ResizeObserver((entries) => {
+		f?.()
+	})
+	observer.observe(canvas)
+	return observer
+}
+
+
+/**
+ * Claude:
+ * Resizes the canvas's backing buffer (width/height attributes) to match
+ * its displayed CSS size * devicePixelRatio, clamped to the device's max
+ * texture size. Returns true if the size actually changed.
+ * @param {GPUDevice} device
+ * @param {HTMLCanvasElement} canvas
+ */
+function resize_canvas_to_display_size(device, canvas) {
+ 
+	const dpr = window.devicePixelRatio || 1
+ 
+	const max_size = device.limits.maxTextureDimension2D
+ 
+	const target_width = Math.max(1, Math.min(Math.round(canvas.clientWidth * dpr), max_size))
+	const target_height = Math.max(1, Math.min(Math.round(canvas.clientHeight * dpr), max_size))
+ 
+	if (canvas.width === target_width && canvas.height === target_height) {
+		return false // no change, avoid unnecessary GPU work
+	}
+ 
+	canvas.width = target_width
+	canvas.height = target_height
+	return true
+}
+
+
+class Projection_Matrix {
+
+	constructor() {
+		this.m = new Float32Array(16)
+
+		this._fov_radians = Math.PI / 4 // 45 degrees, a reasonable default
+		this._aspect_ratio = 1
+		this._near = 0.1
+		this._far = 1000
+
+		this.fix()
+	}
+
+	/** @param {number} new_fov field of view, in radians */
+	set_fov(new_fov) {
+		this._fov_radians = new_fov
+		this.fix()
+	}
+
+	/**
+	 * @param {number} w
+	 * @param {number} h
+	 */
+	set_aspect_ratio(w, h) {
+		this._aspect_ratio = w / h
+		this.fix()
+	}
+
+	/**
+	 * @param {number} near
+	 * @param {number} far
+	 */
+	set_near_far(near, far) {
+		this._near = near
+		this._far = far
+		this.fix()
+	}
+
+	fix() {
+
+		const f = 1.0 / Math.tan(this._fov_radians / 2)
+		const range_inv = 1.0 / (this._near - this._far)
+
+		// column-major, matching WGSL's mat4x4<f32> layout.
+		// WebGPU clip space z is [0, 1] (not OpenGL's [-1, 1]), hence the
+		// different z-column terms compared to a typical GL projection matrix.
+		this.m[0] = f / this._aspect_ratio
+		this.m[1] = 0
+		this.m[2] = 0
+		this.m[3] = 0
+
+		this.m[4] = 0
+		this.m[5] = f
+		this.m[6] = 0
+		this.m[7] = 0
+
+		this.m[8] = 0
+		this.m[9] = 0
+		this.m[10] = this._far * range_inv
+		this.m[11] = -1
+
+		this.m[12] = 0
+		this.m[13] = 0
+		this.m[14] = this._near * this._far * range_inv
+		this.m[15] = 0
+	}
+}
+
+
+
+class Base {
+	constructor() {
+		this.m = new Float32Array([
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			0, 0, 0, 1,
+		])
+	}
+	/** @param {[number,number,number]} delta */
+	translate_me([x,y,z]) {
+		this.m[12] += x
+		this.m[13] += y
+		this.m[14] += z
+	}
+	get_invert() {
+		const inv = new DOMMatrix(Array.from(this.m)).inverse()
+		const r = new Base
+		r.m = inv.toFloat32Array()
+		return r
+	}
+}
+
+
+/**
+ * Loads a PNG (or any image format the browser can decode) from a URL
+ * into a GPUTexture, ready to sample in a shader.
+ * @param {GPUDevice} device
+ * @param {string} url
+ * @returns {Promise<GPUTexture>}
+ */
+async function ASYNC_load_texture_from_url(device, url) {
+
+	const response = await fetch(url)
+	const blob = await response.blob()
+
+	// createImageBitmap decodes the image off the main thread and gives
+	// you pixel dimensions without needing to draw to a <canvas> first
+	const bitmap = await createImageBitmap(blob)
+
+	const texture = device.createTexture({
+		size: [bitmap.width, bitmap.height, 1],
+		format: 'rgba8unorm', // standard 8-bit-per-channel format for typical PNGs
+		usage:
+			GPUTextureUsage.TEXTURE_BINDING | // so it can be sampled in a shader
+			GPUTextureUsage.COPY_DST |        // so we can copy the bitmap into it
+			GPUTextureUsage.RENDER_ATTACHMENT, // required by some browsers for copyExternalImageToTexture
+	})
+
+	device.queue.copyExternalImageToTexture(
+		{ source: bitmap },
+		{ texture: texture },
+		[bitmap.width, bitmap.height],
+	)
+
+	bitmap.close() // free the decoded bitmap's memory once uploaded
+
+	return texture
+}
+
+//#endregion LOTUS LEAVES
+</script>
+
 
 </body>
 
