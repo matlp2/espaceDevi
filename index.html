@@ -2487,6 +2487,8 @@ window.addEventListener('load', () => {
 <script>
 
 //#region LOTUS LEAVES
+{
+
 
 run_flying_lotus_leaves()
 
@@ -2563,7 +2565,7 @@ async function run_flying_lotus_leaves() {
 	})
 
 
-	const INSTANCE_COUNT = 50
+	const INSTANCE_COUNT = 25
 	const MATRIX_BYTE_SIZE = 64 // 4x4 floats * 4 bytes
 	const model_matrix_array_buffer = device.createBuffer({
 		size: INSTANCE_COUNT * MATRIX_BYTE_SIZE,
@@ -3516,6 +3518,8 @@ async function ASYNC_load_texture_from_url(device, url) {
 	return texture
 }
 
+
+}
 //#endregion LOTUS LEAVES
 </script>
 
