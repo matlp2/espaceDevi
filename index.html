@@ -917,7 +917,11 @@ window.addEventListener('load', () => {
 					</i>
 
 					<p style="text-align: left;">
-						Fabian anime les bains sonores depuis 2024.
+						Fabian est praticien bien-être masseur et sonothérapeute.
+					</p>
+
+					<p style="text-align: left;">
+						Il anime les bains sonores depuis 2024. Son parcours en médecine traditionelle chinoise qu'il étudie depuis plusieurs années nourrit profondément sa pratique. Il s'appuit nottament sur les saisons, les cycles de la nature et le calendrier lunisolaire pour donner une couleur et une intention différentes à ses accompagnements tout au long de l'année.
 					</p>
 
 					<p style="text-align: left;">
@@ -2666,7 +2670,7 @@ async function run_flying_lotus_leaves() {
 	})
 
 
-	const INSTANCE_COUNT = 25
+	const INSTANCE_COUNT = Math.random() < 0.01 ? 200 : 25;
 	const MATRIX_BYTE_SIZE = 64 // 4x4 floats * 4 bytes
 	const model_matrix_array_buffer = device.createBuffer({
 		size: INSTANCE_COUNT * MATRIX_BYTE_SIZE,
