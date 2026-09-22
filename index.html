@@ -581,7 +581,7 @@ window.addEventListener('load', () => {
 >
 
 	<div
-		id = planning_grid2
+		id = planning_grid2___OLD_LOCATION
 		style="
 			font-family: 'Inter', sans-serif;
 			margin-top: 1.5em;
@@ -2214,7 +2214,7 @@ window.addEventListener('load', () => {
 
 		<div
 			style="
-				height: 300px;
+				height: 50px;
 			"
 		>
 
@@ -2270,6 +2270,35 @@ window.addEventListener('load', () => {
 		}
 
 		</script>
+
+
+		<div
+			id = planning_grid2
+			style="
+				font-family: 'Inter', sans-serif;
+				margin-top: 1.5em;
+				width: 100%;
+				height: 100%;
+				display: grid;
+				grid-template-columns: repeat(6, 1fr); /* Equal width columns */
+				grid-gap: 1px;
+				/*grid-auto-rows: minmax(100px, auto);*/
+				grid-template-rows: 7% 90%;
+			"
+		></div>
+
+		<style>
+			.ma_deco {
+				box-shadow: 0px 0px 5px rgb(255, 159, 34);
+				border: 1px solid #eea700;
+				border-radius: 15px;
+				background-color: #ffe8ae;
+			}
+			.seance {
+				border-radius: calc(min(.9vw, .5em));
+				margin: calc(min(.2vw, .1em));
+			}
+		</style>
 
 	</div>
 </div>
@@ -2419,7 +2448,7 @@ window.addEventListener('load', () => {
 		}
 		window.profs = profs
 
-		if(false) {
+		{
 			
 			window.jours = {
 				Lundi: {
