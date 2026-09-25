@@ -472,24 +472,219 @@ window.addEventListener('load', () => {
 					<tr>
 						<td>
 							<div
-								class = "ma_deco"
-								style='
-									text-align: left;
-									max-width: 400;
-									font-family: "Cormorant Garamond", serif;
-									font-size: 1.5em;
-									font-weight: bold;
-									padding: 1.25em;
-									/* color: #4d2300; */
-								'
-							><i>
-									Espace Devi,
-									situé au coeur de la ville de Rennes est un lieu de pratique de Yoga et disciplines de bien-être.
-									Les cours ont lieu en petits groupes,
-									dans un cadre agréable et chaleureux,
-									sous les bons auspices de Saraswati,
-									la déesse des arts et de l'apprentissage.
-							</i></div>
+								id="canvas_frame_support"
+								style="
+
+								"
+							>
+								<div
+									class = "ma_deco"
+									style='
+										text-align: left;
+										max-width: 400;
+										font-family: "Cormorant Garamond", serif;
+										font-size: 1.5em;
+										font-weight: bold;
+										padding: 1.25em;
+										min-width: 0px;
+										/* color: #4d2300; */
+									'
+								>
+									<i>
+											Espace Devi,
+											situé au coeur de la ville de Rennes est un lieu de pratique de Yoga et disciplines de bien-être.
+											Les cours ont lieu en petits groupes,
+											dans un cadre agréable et chaleureux,
+											sous les bons auspices de Saraswati,
+											la déesse des arts et de l'apprentissage.
+									</i>
+								</div>
+							</div>
+
+							<script>
+								{
+
+									class HTML_Stacked_Elements_Container {
+										/**
+										 * @param {HTMLElement?} html
+										 */
+										constructor(html) {
+											this.html = html ?? document.createElement('div')
+											this.html.style.display = 'grid'
+											this.html.style.margin = '0.5em'
+											this.html.style.minWidth = '0px'
+											this.fix()
+										}
+
+										fix() {
+											let z_index = 0
+											for(const sub_html of this.html.children) {
+												sub_html.style.gridArea = '1 / 1'
+												sub_html.style.zIndex = z_index++
+											}
+										}
+
+										swap_children_order() {
+											this.html.replaceChildren(...Array.from(this.html.children).reverse())
+											this.fix()
+										}
+
+										/**
+										 * @param {HTMLElement} sub_html
+										 * @param {number?} z_index
+										 */
+										append_stacked(
+											sub_html,
+										) {
+											sub_html.style.gridArea = '1 / 1'
+											this.html.appendChild(sub_html)
+											this.fix()
+										}
+
+										/**
+										 * @param {HTMLElement} sub_html
+										 * @param {number?} z_index
+										 */
+										prepend_stacked(
+											sub_html,
+										) {
+											sub_html.style.gridArea = '1 / 1'
+											this.html.prepend(sub_html)
+											this.fix()
+										}
+									}
+
+
+									const stacked_container = new HTML_Stacked_Elements_Container(
+										document.getElementById('canvas_frame_support')
+									)
+
+									class My_Canvas {
+
+										constructor() {
+											this.html = document.createElement('canvas')
+											this.html.width = div.clientWidth
+											this.html.height = div.clientHeight
+											this.ctx = this.html.getContext('2d')
+
+											const ro = new ResizeObserver(entries => {
+												const last_entry = entries[entries.length - 1]
+												const { inlineSize: width, blockSize: height } = last_entry.contentBoxSize[0]
+												this.set_resolution(width, height)
+												this.draw()
+											})
+
+											ro.observe(this.html)
+
+											
+											this.html.style.width = `100%`
+											this.html.style.height = `100%`
+
+											this.draw()
+										}
+
+										set_resolution(w, h) {
+											this.html.width = w
+											this.html.height = h
+
+											const dpr = window.devicePixelRatio || 1;
+
+											this.html.width = Math.round(w * dpr)
+											this.html.height = Math.round(h * dpr)
+
+											// reset transform then scale so 1 unit = 1 CSS px in your drawing code
+											this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+										}
+
+										draw_rectangle_with_inverted_rounded_edges({
+											r,
+											line_width = 1,
+											x = 0, y = 0,
+											color = 'rgba(255, 0, 0, 1)',
+											w = this.html.width, h = this.html.height,
+											type = 'fill',
+										}) {
+											const { ctx } = this
+											ctx.beginPath()
+											ctx.moveTo(x + r, y)
+											ctx.lineTo(x + w - r, y)
+											ctx.arc(x + w, y, r, Math.PI, Math.PI / 2, true)
+											ctx.lineTo(x + w, y + h - r)
+											ctx.arc(x + w, y + h, r, 1.5 * Math.PI, Math.PI, true)
+											ctx.lineTo(x + r, y + h)
+											ctx.arc(x, y + h, r, 0, -Math.PI / 2, true)
+											ctx.lineTo(x, y + r)
+											ctx.arc(x, y, r, Math.PI / 2, 0, true)
+											ctx.closePath()
+											ctx.lineWidth = line_width
+											if(type === 'stroke') {
+												ctx.strokeStyle = color
+												ctx.stroke()
+											} else if(type === 'fill') {
+												ctx.fillStyle = color
+												ctx.fill()
+											} else {
+												debugger
+											}
+										}
+
+										draw_rectangle() {
+											const { ctx } = this
+											ctx.beginPath()
+											ctx.rect(0, 0, this.html.clientWidth, this.html.clientHeight)
+											ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
+											ctx.fill()
+										}
+
+										draw() {
+											const {ctx} = this
+											this.ctx.clearRect(0, 0, this.html.clientWidth, this.html.clientHeight)
+
+											this.draw_rectangle_with_inverted_rounded_edges({
+												r: 10,
+												x: 0, y: 0,
+												w: this.html.clientWidth, h: this.html.clientHeight,
+												color: 'rgba(255, 255, 255, 0.5)',
+											})
+
+											this.draw_rectangle_with_inverted_rounded_edges({
+												r: 10,
+												x: 0, y: 0,
+												w: this.html.clientWidth, h: this.html.clientHeight,
+												type: 'stroke',
+												color: 'rgba(255, 150, 150, 1)'
+											})
+										}
+
+										superpose_on_parent({
+											padding = 0,
+											type = 'grid',
+										} = {}) {
+											const parent = this.html.parentElement
+											this.html.style.position = 'absolute'
+											this.html.style.top = `-${padding}px`
+											this.html.style.left = `-${padding}px`
+											this.html.style.width = `calc(100% + ${2*padding}px)`
+											this.html.style.height = `calc(100% + ${2*padding}px)`
+											parent.style.position = 'relative'
+											parent.appendChild(this.html)
+										}
+
+									}
+
+									const div = document.getElementById('canvas_frame_support')
+									const my_canvas = new My_Canvas
+									div.prepend(my_canvas.html)
+									my_canvas.superpose_on_parent({
+										padding: 10
+									})
+
+
+									stacked_container.prepend_stacked(my_canvas.html)
+								}
+							</script>
+
+							
 						</td>
 					</tr>
 				</tbody>
