@@ -502,183 +502,236 @@ window.addEventListener('load', () => {
 							</div>
 
 							<script>
-								{
+								class HTML_Stacked_Elements_Container {
+									/**
+									 * @param {HTMLElement?} html
+									 */
+									constructor(html) {
+										this.html = html ?? document.createElement('div')
+										this.html.style.display = 'grid'
+										this.html.style.margin = '0.5em'
+										this.html.style.minWidth = '0px'
+										this.fix()
+									}
 
-									class HTML_Stacked_Elements_Container {
-										/**
-										 * @param {HTMLElement?} html
-										 */
-										constructor(html) {
-											this.html = html ?? document.createElement('div')
-											this.html.style.display = 'grid'
-											this.html.style.margin = '0.5em'
-											this.html.style.minWidth = '0px'
-											this.fix()
-										}
-
-										fix() {
-											let z_index = 0
-											for(const sub_html of this.html.children) {
-												sub_html.style.gridArea = '1 / 1'
-												sub_html.style.zIndex = z_index++
-											}
-										}
-
-										swap_children_order() {
-											this.html.replaceChildren(...Array.from(this.html.children).reverse())
-											this.fix()
-										}
-
-										/**
-										 * @param {HTMLElement} sub_html
-										 * @param {number?} z_index
-										 */
-										append_stacked(
-											sub_html,
-										) {
+									fix() {
+										let z_index = 0
+										for(const sub_html of this.html.children) {
 											sub_html.style.gridArea = '1 / 1'
-											this.html.appendChild(sub_html)
-											this.fix()
-										}
-
-										/**
-										 * @param {HTMLElement} sub_html
-										 * @param {number?} z_index
-										 */
-										prepend_stacked(
-											sub_html,
-										) {
-											sub_html.style.gridArea = '1 / 1'
-											this.html.prepend(sub_html)
-											this.fix()
+											sub_html.style.zIndex = z_index++
 										}
 									}
 
+									swap_children_order() {
+										this.html.replaceChildren(...Array.from(this.html.children).reverse())
+										this.fix()
+									}
 
+									/**
+									 * @param {HTMLElement} sub_html
+									 * @param {number?} z_index
+									 */
+									append_stacked(
+										sub_html,
+									) {
+										sub_html.style.gridArea = '1 / 1'
+										this.html.appendChild(sub_html)
+										this.fix()
+									}
+
+									/**
+									 * @param {HTMLElement} sub_html
+									 * @param {number?} z_index
+									 */
+									prepend_stacked(
+										sub_html,
+									) {
+										sub_html.style.gridArea = '1 / 1'
+										this.html.prepend(sub_html)
+										this.fix()
+									}
+								}
+
+								class My_Canvas {
+
+									constructor() {
+										this.html = document.createElement('canvas')
+										this.ctx = this.html.getContext('2d')
+
+										const ro = new ResizeObserver(entries=>{
+											const last_entry = entries[entries.length - 1]
+											const { inlineSize: width, blockSize: height } = last_entry.contentBoxSize[0]
+											this.set_resolution(width, height)
+											this.draw()
+										})
+
+										ro.observe(this.html)
+										
+										this.html.style.width = `100%`
+										this.html.style.height = `100%`
+
+										this.draw()
+									}
+
+									set_resolution(w, h) {
+										this.html.width = w
+										this.html.height = h
+
+										const dpr = window.devicePixelRatio || 1
+
+										this.html.width = Math.round(w * dpr)
+										this.html.height = Math.round(h * dpr)
+
+										// reset transform then scale so 1 unit = 1 CSS px in your drawing code
+										this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+									}
+
+									draw_rectangle_with_inverted_rounded_edges({
+										r,
+										line_width = 1,
+										x = 0, y = 0,
+										color = 'rgba(255, 0, 0, 1)',
+										w = this.html.width, h = this.html.height,
+										type = 'fill',
+										egde_outer_circles = 10,
+									}) {
+										if(typeof egde_outer_circles === 'number') {
+											egde_outer_circles = [egde_outer_circles,egde_outer_circles,egde_outer_circles,egde_outer_circles]
+										}
+										if(egde_outer_circles.length === 2) {
+											egde_outer_circles = [egde_outer_circles[0],egde_outer_circles[1],egde_outer_circles[0],egde_outer_circles[1]]
+										}
+										const [
+											r_top_outer_circle = 10,
+											r_left_outer_circle = 10,
+											r_bottom_outer_circle = 10,
+											r_right_outer_circle = 10,
+										] = egde_outer_circles
+										const { ctx } = this
+										ctx.beginPath()
+										
+										ctx.moveTo(x + r, y)
+
+										if(r_top_outer_circle !== 0) {
+											ctx.lineTo(x + w/2 - Math.abs(r_top_outer_circle), y)
+											ctx.arc(x + w/2, y, Math.abs(r_top_outer_circle), Math.PI, 0, r_top_outer_circle < 0)
+											ctx.lineTo(x + w - r, y)
+										} else {
+											ctx.lineTo(x + w - r, y)
+										}
+										
+
+										ctx.arc(x + w, y, r, Math.PI, Math.PI / 2, true)
+										
+										if(r_right_outer_circle !== 0) {
+											ctx.lineTo(x + w, y + h/2 - Math.abs(r_right_outer_circle))
+											ctx.arc(x + w, y + h/2, Math.abs(r_right_outer_circle), -Math.PI/2, -3*Math.PI/2, r_right_outer_circle < 0)
+											ctx.lineTo(x + w, y + h - r)
+										} else {
+											ctx.lineTo(x + w, y + h - r)
+										}
+
+										ctx.arc(x + w, y + h, r, 1.5 * Math.PI, Math.PI, true)
+										
+										if(r_bottom_outer_circle !== 0) {
+											ctx.lineTo(x + w/2 + Math.abs(r_bottom_outer_circle), y + h)
+											ctx.arc(x + w/2, y + h, Math.abs(r_bottom_outer_circle), 0, Math.PI, r_bottom_outer_circle < 0)
+											ctx.lineTo(x + r, y + h)
+										} else {
+											ctx.lineTo(x + r, y + h)
+										}
+										
+										ctx.arc(x, y + h, r, 0, -Math.PI / 2, true)
+
+										if(r_left_outer_circle !== 0) {
+											ctx.lineTo(x, y + h/2 + Math.abs(r_left_outer_circle))
+											ctx.arc(x, y + h/2, Math.abs(r_left_outer_circle), Math.PI/2, 3*Math.PI/2, r_left_outer_circle < 0)
+											ctx.lineTo(x, y + r)
+										} else {
+											ctx.lineTo(x, y + r)
+										}
+
+										
+										
+										ctx.arc(x, y, r, Math.PI / 2, 0, true)
+										ctx.closePath()
+										ctx.lineWidth = line_width
+										if(type === 'stroke') {
+											ctx.strokeStyle = color
+											ctx.stroke()
+										} else if(type === 'fill') {
+											ctx.fillStyle = color
+											ctx.fill()
+										} else {
+											debugger
+										}
+									}
+
+									draw_rectangle() {
+										const { ctx } = this
+										ctx.beginPath()
+										ctx.rect(0, 0, this.html.clientWidth, this.html.clientHeight)
+										ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
+										ctx.fill()
+									}
+
+									draw() {
+										const {ctx} = this
+										this.ctx.clearRect(0, 0, this.html.clientWidth, this.html.clientHeight)
+
+										const r = 15
+										const padding = 20
+										const w = this.html.clientWidth - 2*padding
+										const h = this.html.clientHeight - 2*padding
+										const egde_outer_circles = -5
+
+										this.draw_rectangle_with_inverted_rounded_edges({
+											r,
+											x: padding, y: padding,
+											w, h,
+											color: 'rgba(255, 255, 255, 0.5)',
+											egde_outer_circles,
+										})
+
+										this.draw_rectangle_with_inverted_rounded_edges({
+											r,
+											x: padding, y: padding,
+											w, h,
+											type: 'stroke',
+											color: 'rgba(255, 150, 150, 1)',
+											egde_outer_circles,
+										})
+									}
+
+									superpose_on_parent({
+										padding = 0,
+										type = 'grid',
+									} = {}) {
+										const parent = this.html.parentElement
+										this.html.style.position = 'absolute'
+										this.html.style.top = `-${padding}px`
+										this.html.style.left = `-${padding}px`
+										this.html.style.width = `calc(100% + ${2*padding}px)`
+										this.html.style.height = `calc(100% + ${2*padding}px)`
+										parent.style.position = 'relative'
+										parent.appendChild(this.html)
+									}
+
+								}
+
+
+								{
 									const stacked_container = new HTML_Stacked_Elements_Container(
 										document.getElementById('canvas_frame_support')
 									)
-
-									class My_Canvas {
-
-										constructor() {
-											this.html = document.createElement('canvas')
-											this.html.width = div.clientWidth
-											this.html.height = div.clientHeight
-											this.ctx = this.html.getContext('2d')
-
-											const ro = new ResizeObserver(entries => {
-												const last_entry = entries[entries.length - 1]
-												const { inlineSize: width, blockSize: height } = last_entry.contentBoxSize[0]
-												this.set_resolution(width, height)
-												this.draw()
-											})
-
-											ro.observe(this.html)
-
-											
-											this.html.style.width = `100%`
-											this.html.style.height = `100%`
-
-											this.draw()
-										}
-
-										set_resolution(w, h) {
-											this.html.width = w
-											this.html.height = h
-
-											const dpr = window.devicePixelRatio || 1;
-
-											this.html.width = Math.round(w * dpr)
-											this.html.height = Math.round(h * dpr)
-
-											// reset transform then scale so 1 unit = 1 CSS px in your drawing code
-											this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-										}
-
-										draw_rectangle_with_inverted_rounded_edges({
-											r,
-											line_width = 1,
-											x = 0, y = 0,
-											color = 'rgba(255, 0, 0, 1)',
-											w = this.html.width, h = this.html.height,
-											type = 'fill',
-										}) {
-											const { ctx } = this
-											ctx.beginPath()
-											ctx.moveTo(x + r, y)
-											ctx.lineTo(x + w - r, y)
-											ctx.arc(x + w, y, r, Math.PI, Math.PI / 2, true)
-											ctx.lineTo(x + w, y + h - r)
-											ctx.arc(x + w, y + h, r, 1.5 * Math.PI, Math.PI, true)
-											ctx.lineTo(x + r, y + h)
-											ctx.arc(x, y + h, r, 0, -Math.PI / 2, true)
-											ctx.lineTo(x, y + r)
-											ctx.arc(x, y, r, Math.PI / 2, 0, true)
-											ctx.closePath()
-											ctx.lineWidth = line_width
-											if(type === 'stroke') {
-												ctx.strokeStyle = color
-												ctx.stroke()
-											} else if(type === 'fill') {
-												ctx.fillStyle = color
-												ctx.fill()
-											} else {
-												debugger
-											}
-										}
-
-										draw_rectangle() {
-											const { ctx } = this
-											ctx.beginPath()
-											ctx.rect(0, 0, this.html.clientWidth, this.html.clientHeight)
-											ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
-											ctx.fill()
-										}
-
-										draw() {
-											const {ctx} = this
-											this.ctx.clearRect(0, 0, this.html.clientWidth, this.html.clientHeight)
-
-											this.draw_rectangle_with_inverted_rounded_edges({
-												r: 10,
-												x: 0, y: 0,
-												w: this.html.clientWidth, h: this.html.clientHeight,
-												color: 'rgba(255, 255, 255, 0.5)',
-											})
-
-											this.draw_rectangle_with_inverted_rounded_edges({
-												r: 10,
-												x: 0, y: 0,
-												w: this.html.clientWidth, h: this.html.clientHeight,
-												type: 'stroke',
-												color: 'rgba(255, 150, 150, 1)'
-											})
-										}
-
-										superpose_on_parent({
-											padding = 0,
-											type = 'grid',
-										} = {}) {
-											const parent = this.html.parentElement
-											this.html.style.position = 'absolute'
-											this.html.style.top = `-${padding}px`
-											this.html.style.left = `-${padding}px`
-											this.html.style.width = `calc(100% + ${2*padding}px)`
-											this.html.style.height = `calc(100% + ${2*padding}px)`
-											parent.style.position = 'relative'
-											parent.appendChild(this.html)
-										}
-
-									}
+									//stacked_container.html.style.overflow = 'visible'
 
 									const div = document.getElementById('canvas_frame_support')
 									const my_canvas = new My_Canvas
 									div.prepend(my_canvas.html)
 									my_canvas.superpose_on_parent({
-										padding: 10
+										padding: 30
 									})
-
 
 									stacked_container.prepend_stacked(my_canvas.html)
 								}
@@ -1227,7 +1280,7 @@ window.addEventListener('load', () => {
 					</p>
 
 					<p style="text-align: left;">
-						L’atelier se déroule sur 2 heures, de 14h30 à16h30, comme suit:
+						L’atelier se déroule sur 2 heures, de 14h30 à 16h30, comme suit:
 					</p>
 
 					<ul style="text-align: left;">
@@ -3050,14 +3103,14 @@ window.addEventListener('load', () => {
 						prof: profs.Violaine,
 					},
 
-					{
+					/*{
 						jour: 'Mardi',
 						deb: [16, 0],
 						fin: [17, 30],
 						bg: 'blue',
 						txt: 'Yoga adapté',
 						prof: profs.Linda,
-					},
+					},*/
 					{
 						jour: 'Mardi',
 						deb: [18, 0],
