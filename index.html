@@ -381,7 +381,456 @@ window.addEventListener('load', () => {
 	document.body.prepend(master.html)
 })
 
+class HTML_Stacked_Elements_Container {
+	/**
+	 * @param {HTMLElement?} html
+	 */
+	constructor(html) {
+		this.html = html ?? document.createElement('div')
+		this.html.style.display = 'grid'
+		//this.html.style.margin = '0.5em'
+		this.html.style.minWidth = '0px'
+		this.fix()
+	}
 
+	fix() {
+		let z_index = 0
+		for(const sub_html of this.html.children) {
+			sub_html.style.gridArea = '1 / 1'
+			sub_html.style.zIndex = z_index++
+		}
+	}
+
+	swap_children_order() {
+		this.html.replaceChildren(...Array.from(this.html.children).reverse())
+		this.fix()
+	}
+
+	/**
+	 * @param {HTMLElement} sub_html
+	 * @param {number?} z_index
+	 */
+	append_stacked(
+		sub_html,
+	) {
+		sub_html.style.gridArea = '1 / 1'
+		this.html.appendChild(sub_html)
+		this.fix()
+	}
+
+	/**
+	 * @param {HTMLElement} sub_html
+	 * @param {number?} z_index
+	 */
+	prepend_stacked(
+		sub_html,
+	) {
+		sub_html.style.gridArea = '1 / 1'
+		this.html.prepend(sub_html)
+		this.fix()
+	}
+}
+
+
+
+
+class My_Canvas {
+
+	constructor() {
+		this.html = document.createElement('canvas')
+		this.ctx = this.html.getContext('2d')
+
+		const ro = new ResizeObserver(entries=>{
+			const last_entry = entries[entries.length - 1]
+			const { inlineSize: width, blockSize: height } = last_entry.contentBoxSize[0]
+			this.set_resolution(width, height)
+			this.fix()
+		})
+
+		ro.observe(this.html)
+		
+		this.html.style.width = `100%`
+		this.html.style.height = `100%`
+	}
+
+	set_resolution(w, h) {
+		this.html.width = w
+		this.html.height = h
+
+		const dpr = window.devicePixelRatio || 1
+
+		this.html.width = Math.round(w * dpr)
+		this.html.height = Math.round(h * dpr)
+
+		// reset transform then scale so 1 unit = 1 CSS px in your drawing code
+		this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+	}
+
+	draw_line_with_repeating_pattern({
+		x0, y0, x1, y1,
+		pattern_length,
+		density = 1,
+		pattern_count = Math.floor(density * Math.sqrt((x1 - x0)**2 + (y1 - y0)**2) / pattern_length),
+		draw_pattern,
+	}) {
+		const { ctx } = this
+
+		function remap(value, old_min, old_max, new_min, new_max) {
+			return new_min + (value - old_min) * (new_max - new_min) / (old_max - old_min)
+		}
+
+		for(let i = 0; i < pattern_count; i++) {
+			const t = (i + 0.5)/(pattern_count + 2*0.5 - 1)
+			const x_start = x0 + (x1 - x0) * t - pattern_length
+			const y_start = y0 + (y1 - y0) * t - pattern_length
+			const x_end = x0 + (x1 - x0) * t + pattern_length
+			const y_end = y0 + (y1 - y0) * t + pattern_length
+			draw_pattern({
+				x_start, y_start, x_end, y_end,
+			})
+		}
+	}
+
+	get_wh() {
+		return [
+			parseFloat(this.html.width),
+			parseFloat(this.html.height),
+		]
+	}
+
+	draw_rectangle_with_inverted_rounded_edges({
+		r,
+		line_width = 1,
+		x = 0, y = 0,
+		color = 'rgba(255, 0, 0, 1)',
+		w = this.html.width, h = this.html.height,
+		type = 'fill',
+		egde_outer_circles = 10,
+	}) {
+
+		const egde_outer_circles_density = 0.5
+
+		if(typeof egde_outer_circles === 'number') {
+			egde_outer_circles = [egde_outer_circles,egde_outer_circles,egde_outer_circles,egde_outer_circles]
+		}
+		if(egde_outer_circles.length === 2) {
+			egde_outer_circles = [egde_outer_circles[0],egde_outer_circles[1],egde_outer_circles[0],egde_outer_circles[1]]
+		}
+		const [
+			r_top_outer_circle = 10,
+			r_left_outer_circle = 10,
+			r_bottom_outer_circle = 10,
+			r_right_outer_circle = 10,
+		] = egde_outer_circles
+		const { ctx } = this
+		ctx.beginPath()
+		
+		ctx.moveTo(x + r, y)
+
+		if(r_top_outer_circle !== 0) {
+			this.draw_line_with_repeating_pattern({
+				x0: x + r, y0: y,
+				x1: x + w - r, y1: y,
+				pattern_length: 2 * Math.abs(r_top_outer_circle),
+				density: egde_outer_circles_density,
+				draw_pattern: ({x_start, y_start, x_end, y_end}) => {
+					ctx.arc(
+						(x_start + x_end)/2,
+						(y_start + y_end)/2,
+						Math.abs(r_top_outer_circle),
+						Math.PI, 0,
+						r_top_outer_circle < 0
+					)
+				}
+			})
+		} else {
+			ctx.lineTo(x + w - r, y)
+		}
+		
+
+		ctx.arc(x + w, y, r, Math.PI, Math.PI / 2, true)
+		
+		if(r_right_outer_circle !== 0) {
+			this.draw_line_with_repeating_pattern({
+				x0: x + w, y0: y + r,
+				x1: x + w, y1: y + h - r,
+				pattern_length: 2 * Math.abs(r_right_outer_circle),
+				density: egde_outer_circles_density,
+				draw_pattern: ({x_start, y_start, x_end, y_end}) => {
+					ctx.arc(
+						(x_start + x_end)/2,
+						(y_start + y_end)/2,
+						Math.abs(r_right_outer_circle),
+						-Math.PI/2, -3*Math.PI/2,
+						r_right_outer_circle < 0
+					)
+				}
+			})
+		} else {
+			ctx.lineTo(x + w, y + h - r)
+		}
+
+		ctx.arc(x + w, y + h, r, 1.5 * Math.PI, Math.PI, true)
+		
+		if(r_bottom_outer_circle !== 0) {
+			this.draw_line_with_repeating_pattern({
+				x0: x + w - r, y0: y + h,
+				x1: x + r, y1: y + h,
+				pattern_length: 2 * Math.abs(r_bottom_outer_circle),
+				density: egde_outer_circles_density,
+				draw_pattern: ({x_start, y_start, x_end, y_end}) => {
+					ctx.arc(
+						(x_start + x_end)/2,
+						(y_start + y_end)/2,
+						Math.abs(r_bottom_outer_circle),
+						0, Math.PI,
+						r_bottom_outer_circle < 0
+					)
+				}
+			})
+		} else {
+			ctx.lineTo(x + r, y + h)
+		}
+		
+		ctx.arc(x, y + h, r, 0, -Math.PI / 2, true)
+
+		if(r_left_outer_circle !== 0) {
+			this.draw_line_with_repeating_pattern({
+				x0: x, y0: y + h - r,
+				x1: x, y1: y + r,
+				pattern_length: 2 * Math.abs(r_left_outer_circle),
+				density: egde_outer_circles_density,
+				draw_pattern: ({x_start, y_start, x_end, y_end}) => {
+					ctx.arc(
+						(x_start + x_end)/2,
+						(y_start + y_end)/2,
+						Math.abs(r_left_outer_circle),
+						Math.PI/2, 3*Math.PI/2,
+						r_left_outer_circle < 0
+					)
+				}
+			})
+		} else {
+			ctx.lineTo(x, y + r)
+		}
+
+		
+		
+		ctx.arc(x, y, r, Math.PI / 2, 0, true)
+		ctx.closePath()
+		ctx.lineWidth = line_width
+		if(type === 'stroke') {
+			ctx.strokeStyle = color
+			ctx.stroke()
+		} else if(type === 'fill') {
+			ctx.fillStyle = color
+			ctx.fill()
+		} else {
+			debugger
+		}
+	}
+
+	fix({
+
+	} = {}) {
+		this._draw?.()
+	}
+
+	draw_rectangle() {
+		const { ctx } = this
+		ctx.beginPath()
+		ctx.rect(0, 0, this.html.clientWidth, this.html.clientHeight)
+		ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
+		ctx.fill()
+	}
+
+	draw_flower({
+		petal_count = 5,
+		inner_radius = 0.2 * Math.min(this.html.clientWidth, this.html.clientHeight) / 2 - 2,
+		r = Math.min(this.html.clientWidth, this.html.clientHeight) / 2 - 2,
+		line_width = 1,
+		color = 'rgba(255, 150, 150, 1)',
+		type = 'fill',
+		rotation_angle = 0,
+	} = {}) {
+		const {ctx} = this
+		const [w, h] = this.get_wh()
+		const center_x = w / 2
+		const center_y = h / 2
+
+		const path = new Path2D()
+
+		function make_petal({
+			bulge = 0,      // x of 1st control point; negative bulges past the base edges (fatter), positive pinches in
+			base_y = 0.4,   // y of 1st control point; how far up the side runs before curving
+			shoulder_x = 0.4, // x of 2nd control point; closer to 0.5 = pointier tip, closer to 0 = rounder
+			shoulder_y = 0.8, // y of 2nd control point; higher = narrower, more drawn-out tip
+		} = {}) {
+			const m = (x) => 1 - x // mirror across the petal's center line
+			return new Path2D(`
+				M 0 0
+				C ${bulge} ${base_y} ${shoulder_x} ${shoulder_y} 0.5 1
+				C ${m(shoulder_x)} ${shoulder_y} ${m(bulge)} ${base_y} 1 0
+				Z
+			`)
+		}
+
+		const PETAL = make_petal({
+			bulge: -2,
+			base_y: 0.4,
+			shoulder_x: 0,
+		})
+
+		// distance from center to the middle of each polygon edge
+		const apothem = inner_radius * Math.cos(Math.PI / petal_count)
+		const petal_height = r - apothem
+
+		for (let i = 0; i < petal_count; ++i) {
+			const a0 = rotation_angle + 2 * Math.PI * (i / petal_count)
+			const a1 = rotation_angle + 2 * Math.PI * ((i + 1) / petal_count)
+			const a_mid = (a0 + a1) / 2
+			const x0 = center_x + inner_radius * Math.cos(a0), y0 = center_y + inner_radius * Math.sin(a0)
+			const x1 = center_x + inner_radius * Math.cos(a1), y1 = center_y + inner_radius * Math.sin(a1)
+
+			// the inner polygon, so the center is filled
+			if (type === 'fill') {
+				if (i === 0) path.moveTo(x0, y0)
+				path.lineTo(x1, y1)
+			}
+
+			// outward normal
+			const nx = Math.cos(a_mid), ny = Math.sin(a_mid)
+
+			const seg_len = Math.hypot(x1 - x0, y1 - y0)
+
+			path.addPath(PETAL, new DOMMatrix([
+				x1 - x0, y1 - y0,
+				nx * petal_height, ny * petal_height,
+				x0, y0,
+			]))
+		}
+		if (type === 'fill') path.closePath()
+
+		function make_polygon_path({center_x, center_y, radius, sides}) {
+			let d = ''
+			for (let i = 0; i < sides; ++i) {
+				const a = rotation_angle + 2 * Math.PI * (i / sides)
+				const x = center_x + radius * Math.cos(a)
+				const y = center_y + radius * Math.sin(a)
+				d += `${i === 0 ? 'M' : 'L'} ${x} ${y} `
+			}
+			return new Path2D(d + 'Z')
+		}
+
+		const inner_path = make_polygon_path({center_x, center_y, radius: inner_radius, sides: petal_count})
+		path.addPath(inner_path)
+
+		ctx.lineWidth = line_width
+		if (type === 'stroke') {
+			ctx.strokeStyle = color
+			ctx.stroke(path)
+		} else if (type === 'fill') {
+			ctx.fillStyle = color
+			ctx.fill(path)
+		}
+	}
+
+	draw_for_welcome_description() {
+		this._draw = ()=>{
+			const {ctx} = this
+			this.ctx.clearRect(0, 0, this.html.clientWidth, this.html.clientHeight)
+
+			const r = 10
+			const padding = 20
+			const w = this.html.clientWidth - 2*padding
+			const h = this.html.clientHeight - 2*padding
+			const egde_outer_circles = -5
+
+			this.draw_rectangle_with_inverted_rounded_edges({
+				r,
+				x: padding, y: padding,
+				w, h,
+				color: 'rgba(255, 255, 255, 0.5)',
+				egde_outer_circles,
+			})
+
+			this.draw_rectangle_with_inverted_rounded_edges({
+				r,
+				x: padding, y: padding,
+				w, h,
+				type: 'stroke',
+				color: 'rgba(255, 150, 150, 1)',
+				egde_outer_circles,
+			})
+		}
+		this.fix()
+	}
+
+	draw_for_espaceDevi_logo() {
+		this._draw = ()=>{
+			const {ctx} = this
+			this.ctx.clearRect(0, 0, this.html.clientWidth, this.html.clientHeight)
+
+			const r = 10
+			const padding = 20
+			const w = this.html.clientWidth - 2*padding
+			const h = this.html.clientHeight - 2*padding
+			const egde_outer_circles = 0
+
+			this.draw_rectangle_with_inverted_rounded_edges({
+				r,
+				x: padding, y: padding,
+				w, h,
+				color: 'rgba(255, 255, 255, 0.5)',
+				egde_outer_circles,
+			})
+
+			this.draw_rectangle_with_inverted_rounded_edges({
+				r,
+				x: padding, y: padding,
+				w, h,
+				type: 'stroke',
+				color: 'rgba(255, 150, 150, 1)',
+				egde_outer_circles,
+			})
+
+			{
+				const petal_count = 5
+				this.draw_flower({
+					petal_count,
+					color: 'rgba(255, 200, 200, 0.5)',
+				})
+				this.draw_flower({
+					petal_count,
+					rotation_angle: Math.PI / petal_count,
+					//color: 'rgba(255, 150, 150, 1)',
+					//color: 'rgba(255, 200, 200, 1)',
+					color: 'rgba(255, 255, 255, 1)',
+				})
+				
+				
+			}
+			
+		}
+		this.fix()
+		
+	}
+
+	superpose_on_parent({
+		padding = 0,
+		type = 'grid',
+	} = {}) {
+		const parent = this.html.parentElement
+		this.html.style.position = 'absolute'
+		this.html.style.top = `-${padding}px`
+		this.html.style.left = `-${padding}px`
+		this.html.style.width = `calc(100% + ${2*padding}px)`
+		this.html.style.height = `calc(100% + ${2*padding}px)`
+		parent.style.position = 'relative'
+		parent.appendChild(this.html)
+	}
+
+}
 
 
 </script>
@@ -454,19 +903,49 @@ window.addEventListener('load', () => {
 			>
 				<tbody>
 					<tr>
-						<td>
-							<img
-								src="assets/Accueil_espaceDevi_w500_transparent.png"
-								alt=""
-								style='
-									max-width: 22em;
-									max-height: 22em;
+						<td
+						>
+							<div
+								style="
+									width: fit-content;
+									margin: auto;
+									margin-top: 2em;
+									margin-bottom: 2em;
 									display: block;
-									margin-left: auto;
-									margin-right: auto;
-								'
+								"
 							>
+								<img
+									src="assets/Accueil_espaceDevi_transparent.png"
+									id="espaceDeviLogo"
+									alt=""
+									style='
+										max-width: 22em;
+										max-height: 22em;
+										display: block;
+										margin-left: auto;
+										margin-right: auto;
+									'
+								>
+							</div>
 						</td>
+						<script>
+							{
+								const logo = document.getElementById('espaceDeviLogo')
+								const parent = logo.parentElement
+								const stacked_container = new HTML_Stacked_Elements_Container(
+									parent
+								)
+								const my_canvas = new My_Canvas
+								stacked_container.prepend_stacked(my_canvas.html)
+								my_canvas.superpose_on_parent({
+									padding: 40
+								})
+								my_canvas.draw_for_espaceDevi_logo()
+								
+							}
+
+
+						</script>
 					</tr>
 
 					<tr>
@@ -502,238 +981,26 @@ window.addEventListener('load', () => {
 							</div>
 
 							<script>
-								class HTML_Stacked_Elements_Container {
-									/**
-									 * @param {HTMLElement?} html
-									 */
-									constructor(html) {
-										this.html = html ?? document.createElement('div')
-										this.html.style.display = 'grid'
-										this.html.style.margin = '0.5em'
-										this.html.style.minWidth = '0px'
-										this.fix()
-									}
-
-									fix() {
-										let z_index = 0
-										for(const sub_html of this.html.children) {
-											sub_html.style.gridArea = '1 / 1'
-											sub_html.style.zIndex = z_index++
-										}
-									}
-
-									swap_children_order() {
-										this.html.replaceChildren(...Array.from(this.html.children).reverse())
-										this.fix()
-									}
-
-									/**
-									 * @param {HTMLElement} sub_html
-									 * @param {number?} z_index
-									 */
-									append_stacked(
-										sub_html,
-									) {
-										sub_html.style.gridArea = '1 / 1'
-										this.html.appendChild(sub_html)
-										this.fix()
-									}
-
-									/**
-									 * @param {HTMLElement} sub_html
-									 * @param {number?} z_index
-									 */
-									prepend_stacked(
-										sub_html,
-									) {
-										sub_html.style.gridArea = '1 / 1'
-										this.html.prepend(sub_html)
-										this.fix()
-									}
-								}
-
-								class My_Canvas {
-
-									constructor() {
-										this.html = document.createElement('canvas')
-										this.ctx = this.html.getContext('2d')
-
-										const ro = new ResizeObserver(entries=>{
-											const last_entry = entries[entries.length - 1]
-											const { inlineSize: width, blockSize: height } = last_entry.contentBoxSize[0]
-											this.set_resolution(width, height)
-											this.draw()
-										})
-
-										ro.observe(this.html)
-										
-										this.html.style.width = `100%`
-										this.html.style.height = `100%`
-
-										this.draw()
-									}
-
-									set_resolution(w, h) {
-										this.html.width = w
-										this.html.height = h
-
-										const dpr = window.devicePixelRatio || 1
-
-										this.html.width = Math.round(w * dpr)
-										this.html.height = Math.round(h * dpr)
-
-										// reset transform then scale so 1 unit = 1 CSS px in your drawing code
-										this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-									}
-
-									draw_rectangle_with_inverted_rounded_edges({
-										r,
-										line_width = 1,
-										x = 0, y = 0,
-										color = 'rgba(255, 0, 0, 1)',
-										w = this.html.width, h = this.html.height,
-										type = 'fill',
-										egde_outer_circles = 10,
-									}) {
-										if(typeof egde_outer_circles === 'number') {
-											egde_outer_circles = [egde_outer_circles,egde_outer_circles,egde_outer_circles,egde_outer_circles]
-										}
-										if(egde_outer_circles.length === 2) {
-											egde_outer_circles = [egde_outer_circles[0],egde_outer_circles[1],egde_outer_circles[0],egde_outer_circles[1]]
-										}
-										const [
-											r_top_outer_circle = 10,
-											r_left_outer_circle = 10,
-											r_bottom_outer_circle = 10,
-											r_right_outer_circle = 10,
-										] = egde_outer_circles
-										const { ctx } = this
-										ctx.beginPath()
-										
-										ctx.moveTo(x + r, y)
-
-										if(r_top_outer_circle !== 0) {
-											ctx.lineTo(x + w/2 - Math.abs(r_top_outer_circle), y)
-											ctx.arc(x + w/2, y, Math.abs(r_top_outer_circle), Math.PI, 0, r_top_outer_circle < 0)
-											ctx.lineTo(x + w - r, y)
-										} else {
-											ctx.lineTo(x + w - r, y)
-										}
-										
-
-										ctx.arc(x + w, y, r, Math.PI, Math.PI / 2, true)
-										
-										if(r_right_outer_circle !== 0) {
-											ctx.lineTo(x + w, y + h/2 - Math.abs(r_right_outer_circle))
-											ctx.arc(x + w, y + h/2, Math.abs(r_right_outer_circle), -Math.PI/2, -3*Math.PI/2, r_right_outer_circle < 0)
-											ctx.lineTo(x + w, y + h - r)
-										} else {
-											ctx.lineTo(x + w, y + h - r)
-										}
-
-										ctx.arc(x + w, y + h, r, 1.5 * Math.PI, Math.PI, true)
-										
-										if(r_bottom_outer_circle !== 0) {
-											ctx.lineTo(x + w/2 + Math.abs(r_bottom_outer_circle), y + h)
-											ctx.arc(x + w/2, y + h, Math.abs(r_bottom_outer_circle), 0, Math.PI, r_bottom_outer_circle < 0)
-											ctx.lineTo(x + r, y + h)
-										} else {
-											ctx.lineTo(x + r, y + h)
-										}
-										
-										ctx.arc(x, y + h, r, 0, -Math.PI / 2, true)
-
-										if(r_left_outer_circle !== 0) {
-											ctx.lineTo(x, y + h/2 + Math.abs(r_left_outer_circle))
-											ctx.arc(x, y + h/2, Math.abs(r_left_outer_circle), Math.PI/2, 3*Math.PI/2, r_left_outer_circle < 0)
-											ctx.lineTo(x, y + r)
-										} else {
-											ctx.lineTo(x, y + r)
-										}
-
-										
-										
-										ctx.arc(x, y, r, Math.PI / 2, 0, true)
-										ctx.closePath()
-										ctx.lineWidth = line_width
-										if(type === 'stroke') {
-											ctx.strokeStyle = color
-											ctx.stroke()
-										} else if(type === 'fill') {
-											ctx.fillStyle = color
-											ctx.fill()
-										} else {
-											debugger
-										}
-									}
-
-									draw_rectangle() {
-										const { ctx } = this
-										ctx.beginPath()
-										ctx.rect(0, 0, this.html.clientWidth, this.html.clientHeight)
-										ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
-										ctx.fill()
-									}
-
-									draw() {
-										const {ctx} = this
-										this.ctx.clearRect(0, 0, this.html.clientWidth, this.html.clientHeight)
-
-										const r = 15
-										const padding = 20
-										const w = this.html.clientWidth - 2*padding
-										const h = this.html.clientHeight - 2*padding
-										const egde_outer_circles = -5
-
-										this.draw_rectangle_with_inverted_rounded_edges({
-											r,
-											x: padding, y: padding,
-											w, h,
-											color: 'rgba(255, 255, 255, 0.5)',
-											egde_outer_circles,
-										})
-
-										this.draw_rectangle_with_inverted_rounded_edges({
-											r,
-											x: padding, y: padding,
-											w, h,
-											type: 'stroke',
-											color: 'rgba(255, 150, 150, 1)',
-											egde_outer_circles,
-										})
-									}
-
-									superpose_on_parent({
-										padding = 0,
-										type = 'grid',
-									} = {}) {
-										const parent = this.html.parentElement
-										this.html.style.position = 'absolute'
-										this.html.style.top = `-${padding}px`
-										this.html.style.left = `-${padding}px`
-										this.html.style.width = `calc(100% + ${2*padding}px)`
-										this.html.style.height = `calc(100% + ${2*padding}px)`
-										parent.style.position = 'relative'
-										parent.appendChild(this.html)
-									}
-
-								}
+								
 
 
 								{
+									const div = document.getElementById('canvas_frame_support')
 									const stacked_container = new HTML_Stacked_Elements_Container(
-										document.getElementById('canvas_frame_support')
+										div
 									)
 									//stacked_container.html.style.overflow = 'visible'
-
-									const div = document.getElementById('canvas_frame_support')
+									stacked_container.html.style.margin = '1.25em'
+									
 									const my_canvas = new My_Canvas
-									div.prepend(my_canvas.html)
+									my_canvas.draw_for_welcome_description()
+									//div.prepend(my_canvas.html)
+									stacked_container.prepend_stacked(my_canvas.html)
 									my_canvas.superpose_on_parent({
 										padding: 30
 									})
 
-									stacked_container.prepend_stacked(my_canvas.html)
+									
 								}
 							</script>
 
@@ -1122,7 +1389,7 @@ window.addEventListener('load', () => {
 
 
 
-		<button
+		<!--button
 			class="mon_container"
 		>
 
@@ -1215,7 +1482,7 @@ window.addEventListener('load', () => {
 
 			</div>
 			
-		</button>
+		</button-->
 
 
 
@@ -1459,9 +1726,10 @@ window.addEventListener('load', () => {
 						margin: auto;
 					"
 				>
-					<tr>
-						<td>12 et 26 </td> <td>Septembre</td>
-					</tr>
+					<tr> <td>samedi 21</td> <td>novembre</td> <td>9h - 10h15</td> </tr>
+					<tr> <td>vendredi 27</td> <td>novembre</td> <td>17h30 - 18h45</td> </tr>
+					<tr> <td>samedi 5</td> <td>décembre</td> <td>9h - 10h15</td> </tr>
+					<tr> <td>samedi 19</td> <td>décembre</td> <td>9h - 10h15</td> </tr>
 					<!--tr>
 						<td>10</td> <td>Octobre</td>
 					</tr>
