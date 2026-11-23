@@ -28,7 +28,7 @@
 		margin: 0;
 		width:100%;
 		height: 100%;
-		background-color: rgba(255, 218, 130, 1);
+		background-color: rgba(255, 218, 130, 0.83);
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
@@ -94,7 +94,7 @@
 	.tabs_menu {
 		width: 100%;
 		/*background-color: rgba(255, 255, 255, .5);*/
-		background-color: #fff7b1;
+		background-color: #fff7b1cb;
 		padding-top: 0;
 		padding-bottom: 0;
 		font-family: sans-serif;
@@ -164,7 +164,7 @@ class Master {
 		this.html.appendChild(this.navbar.html)
 
 		this.html.style.fontFamily = 'sans-serif'
-		this.html.style.backgroundColor = 'rgba(255, 218, 130, 1)'
+		this.html.style.backgroundColor = 'rgba(255, 218, 130, 0.7)'
 
 		/** @type {Page[]} */
 		this.pages = [
@@ -209,7 +209,7 @@ class Navbar {
 		this.html.style.flexWrap = 'wrap'
 		this.html.style.fontSize = 'calc(min(1.6em, 10vw, 10vh))'
 		this.html.style.backgroundColor = 'rgba(255, 255, 255, .5)'
-		this.html.style.backgroundColor = '#fff7b1'
+		this.html.style.backgroundColor = '#fff7b1cb'
 		this.html.style.paddingTop = '0'
 		this.html.style.paddingBottom = '0'
 		this.html.style.fontFamily = 'sans-serif'
@@ -861,7 +861,7 @@ class My_Canvas {
 			padding: 2em 0;
 			gap: 20px 70px;
 			list-style-type: none;
-			background: #fff7b1;
+			background: #fff7b1cb;
 			display: flex;
 			flex-direction: row;
 			width: 100%;
@@ -1017,7 +1017,7 @@ class My_Canvas {
 		style="
 			text-align: left;
 			padding: 2em;
-			background-color: #fff7b1;
+			background-color: #fff7b1cb;
 			box-shadow: 0 1px 10px 0px orange;
 			line-height: 1.5em;
 		"
@@ -1152,7 +1152,7 @@ class My_Canvas {
 >
 	<style>
 		.mon_container {
-			background-color: #ffe8ae;
+			background-color: #ffe8ae64;
 			text-align: left;
 			outline: none;
 			font-size: 18px;
@@ -2823,7 +2823,7 @@ class My_Canvas {
 				box-shadow: 0px 0px 5px rgb(255, 159, 34);
 				border: 1px solid #eea700;
 				border-radius: 15px;
-				background-color: #ffe8ae;
+				background-color: #ffe8aeac;
 			}
 			.seance {
 				border-radius: calc(min(.9vw, .5em));
