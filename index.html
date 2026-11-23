@@ -4956,6 +4956,21 @@ async function ASYNC_load_texture_from_url(device, url) {
 </script>
 
 
+<script type="module">
+	import { LotusWaterScene } from './lotuses_on_water_with_Claude/lotus-water.js';
+	const canvas = document.createElement('canvas')
+	canvas.style.position = 'absolute'
+	canvas.style.width = "100%"
+	canvas.style.height = "100%"
+	canvas.style.zIndex = "-1"
+	document.body.prepend(canvas)
+	//canvas.width = "500px"
+	//canvas.height = "500px"
+	const scene = new LotusWaterScene(canvas, { onFlyModeChange: flying => {} });
+	await scene.start();   // also: stop(), dispose(), resetCamera()
+</script>
+
+
 </body>
 
 

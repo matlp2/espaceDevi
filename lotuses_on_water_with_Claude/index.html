@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lotus Flow — Yoga Studio</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #f3d9c8; font-family: "Cormorant Garamond", Georgia, serif; color: #fff; }
+    #bg { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; z-index: 0; }
+    main {
+      position: relative; z-index: 1; min-height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; pointer-events: none; text-shadow: 0 2px 24px rgba(40, 30, 60, .35);
+    }
+    main h1 { font-weight: 400; font-size: clamp(3rem, 9vw, 7rem); letter-spacing: .08em; margin: 0; }
+    main p { font-size: clamp(1rem, 2.2vw, 1.5rem); letter-spacing: .3em; text-transform: uppercase; margin: .6em 0 0; opacity: .9; }
+    main a {
+      pointer-events: auto; margin-top: 2.2em; padding: .8em 2.2em; border: 1px solid rgba(255,255,255,.8);
+      border-radius: 999px; color: #fff; text-decoration: none; letter-spacing: .2em; font-size: .9rem;
+      backdrop-filter: blur(6px); background: rgba(255,255,255,.12); transition: background .3s;
+    }
+    main a:hover { background: rgba(255,255,255,.28); }
+    #hint {
+      position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 2;
+      font: 13px/1.4 system-ui, sans-serif; color: #fff; background: rgba(20, 30, 40, .35);
+      padding: 6px 14px; border-radius: 999px; backdrop-filter: blur(6px); transition: background .3s;
+    }
+    #hint.flying { background: rgba(200, 60, 110, .55); }
+    #fallback { display: none; position: fixed; inset: 0; z-index: 3; align-items: center; justify-content: center;
+      background: linear-gradient(#7aa5c9, #f3cdb8); font: 16px system-ui, sans-serif; color: #234; text-align: center; padding: 2em; }
+  </style>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+
+  <main>
+    <h1>Flow</h1>
+    <p>Breathe · Move · Be still</p>
+    <a href="#classes">Explore classes</a>
+  </main>
+
+  <div id="hint">Tap <b>Alt</b> to explore · mouse to look · WASD to move · Q/E down/up · Shift faster</div>
+  <div id="fallback"><div>This background needs a browser with WebGPU (recent Chrome, Edge, Safari or Firefox).</div></div>
+
+  <script type="module">
+    import { LotusWaterScene } from './lotus-water.js';
+
+    const hint = document.getElementById('hint');
+    const idleHint = hint.innerHTML;
+
+    if (!LotusWaterScene.isSupported()) {
+      document.getElementById('fallback').style.display = 'flex';
+    } else {
+      const scene = new LotusWaterScene(document.getElementById('bg'), {
+        onFlyModeChange(flying) {
+          hint.classList.toggle('flying', flying);
+          hint.innerHTML = flying
+            ? 'Fly mode · WASD move · mouse look · Q/E down/up · Shift faster · <b>Alt</b> or Esc to exit'
+            : idleHint;
+        },
+      });
+      scene.start().catch(err => {
+        console.error(err);
+        document.getElementById('fallback').style.display = 'flex';
+      });
+      window.lotusScene = scene; // handy for debugging, e.g. lotusScene.resetCamera()
+    }
+  </script>
+</body>
+</html>
